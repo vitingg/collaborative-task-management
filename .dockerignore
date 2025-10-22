@@ -1,0 +1,16 @@
+node_modules
+
+apps/*/node_modules
+
+packages/*/node_modules
+
+.turbo
+dist
+build
+
+.git
+.gitignore
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
