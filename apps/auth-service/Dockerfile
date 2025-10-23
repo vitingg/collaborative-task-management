@@ -4,8 +4,9 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY apps/auth-service/package*.json ./apps/auth-service/
+COPY packages/types/package*.json ./packages/types/
 
 RUN npm install
-RUN npm install --prefix ./apps/auth-service
+
 
 COPY . .

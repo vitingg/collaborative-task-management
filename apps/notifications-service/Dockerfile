@@ -4,8 +4,9 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY apps/notifications-service/package*.json ./apps/notifications-service/
+COPY packages/types/package*.json ./packages/types/
 
 RUN npm install
-RUN npm install --prefix ./apps/notifications-service
+
 
 COPY . .

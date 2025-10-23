@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY apps/tasks-service/package*.json ./apps/tasks-service/
+COPY packages/types/package*.json ./packages/types/
 
 RUN npm install
-RUN npm install --prefix ./apps/tasks-service
 
 COPY . .
