@@ -1,0 +1,10 @@
+{
+  "name": "@collab-task-management/types",
+  "version": "1.0.0",
+  "private": true,
+  "files": [
+    "nest-services.json",
+    "react.app.json",
+    "react.node.json"
+  ]
+}

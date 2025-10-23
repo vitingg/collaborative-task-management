@@ -1,6 +1,6 @@
 import "./global.css";
 
-function App() {
+export function App() {
   return (
     <div>
       <p className="w-full h-screen bg-zinc-950 text-zinc-200 flex items-center justify-center">
@@ -10,4 +10,3 @@ function App() {
   );
 }
 
-export default App;
