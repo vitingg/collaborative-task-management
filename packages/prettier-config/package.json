@@ -1,0 +1,13 @@
+{
+  "name": "@collab-task-management/prettier-config",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
+  "files": [
+    ".prettierrc.json",
+    "index/js"
+  ]
+}

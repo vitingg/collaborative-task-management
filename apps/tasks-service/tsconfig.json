@@ -1,10 +1,12 @@
 {
-  "extends": "../../packages/types/nest-services.json",
+  "extends": "../../packages/types/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist"
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../../packages/types/src/dtos/tasks/create-task.dto.ts",
+    "../../packages/types/src/dtos/tasks/update-task.dto.ts"
   ],
   "exclude": [
     "node_modules",
