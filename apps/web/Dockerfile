@@ -4,7 +4,14 @@
   WORKDIR /app
 
   COPY package*.json ./
+
   COPY apps/web/package*.json ./apps/web/
+  COPY apps/api-gateway/package*.json ./apps/api-gateway/
+  COPY apps/auth-service/package*.json ./apps/auth-service/
+  COPY apps/tasks-service/package*.json ./apps/tasks-service/
+  COPY apps/notifications-service/package*.json ./apps/notifications-service/
+
+  COPY packages/types/package*.json ./packages/types/
 
   RUN npm install
   RUN npm install --prefix ./apps/web

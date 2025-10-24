@@ -2,16 +2,51 @@
   "name": "@collab-task-management/types",
   "version": "1.0.0",
   "private": true,
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "files": [
-    "src/index.ts"
+    "dist"
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./dtos/auth/register-user": {
+      "import": "./dist/dtos/auth/register-user.mjs",
+      "require": "./dist/dtos/auth/register-user.js",
+      "types": "./dist/dtos/auth/register-user.d.ts"
+    },
+    "./dtos/auth/login-user": {
+      "import": "./dist/dtos/auth/login-user.mjs",
+      "require": "./dist/dtos/auth/login-user.js",
+      "types": "./dist/dtos/auth/login-user.d.ts"
+    },
+    "./dtos/tasks/create-task": {
+      "import": "./dist/dtos/tasks/create-task.mjs",
+      "require": "./dist/dtos/tasks/create-task.js",
+      "types": "./dist/dtos/tasks/create-task.d.ts"
+    },
+    "./dtos/tasks/update-task": {
+      "import": "./dist/dtos/tasks/update-task.mjs",
+      "require": "./dist/dtos/tasks/update-task.js",
+      "types": "./dist/dtos/tasks/update-task.d.ts"
+    },
+    "./entities/task.enums": {
+      "import": "./dist/entities/task.enums.mjs",
+      "require": "./dist/entities/task.enums.js",
+      "types": "./dist/entities/task.enums.d.ts"
+    }
   },
   "dependencies": {
+    "@nestjs/mapped-types": "^2.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2"
   },

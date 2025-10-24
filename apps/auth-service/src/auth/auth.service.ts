@@ -5,7 +5,7 @@ import { Repository } from "typeorm";
 import { User } from "./auth.entity";
 import * as bcrypt from "bcrypt";
 
-Injectable();
+@Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)

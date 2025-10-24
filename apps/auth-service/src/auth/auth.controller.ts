@@ -1,7 +1,7 @@
 import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { RegisterUserDto, LoginUserDto } from "@collab-task-management/types";
-import type { AuthService } from "./auth.service";
+import { AuthService } from "./auth.service";
 
 @Controller("auth")
 export class AuthController {
