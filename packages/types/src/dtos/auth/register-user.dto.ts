@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength } from "class-validator";
 
 export class RegisterUserDto {
   @IsString()
@@ -9,6 +9,8 @@ export class RegisterUserDto {
   email: string;
 
   @IsString()
-  @MinLength(8, { message: 'A senha deve ter no mínimo 8 caracteres' })
+  @MinLength(8, { message: "A senha deve ter no mínimo 8 caracteres" })
   password: string;
 }
+
+

@@ -1,26 +1,42 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateTaskDto, UpdateTaskDto } from "@collab-task-management/types";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Task } from "./entities/task.entity";
+import { Comment } from "./entities/comment.entity";
 
 @Injectable()
 export class TasksService {
-  create(createTaskDto: CreateTaskDto) {
-    return 'This action adds a new task';
+  constructor(
+    @InjectRepository(Task)
+    private readonly taskRepository: Repository<Task>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>
+  ) {}
+
+  async create(createTaskDto: CreateTaskDto): Promise<Task> {
+    const newTask = this.taskRepository.create(createTaskDto);
+    return this.taskRepository.save(newTask);
   }
 
-  findAll() {
-    return `This action returns all tasks`;
+  async findAll(): Promise<Task[]> {
+    return this.taskRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} task`;
+  async findOne(id: string): Promise<Task> {
+    const task = await this.taskRepository.findOneBy({ id });
+    if (!task) {
+      throw new Error("Task not found!");
+    }
+    return task;
   }
 
-  update(id: number, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+  async update(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
+    await this.taskRepository.update(id, updateTaskDto);
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} task`;
+  async remove(id: string) {
+    return this.taskRepository.delete(id);
   }
 }
