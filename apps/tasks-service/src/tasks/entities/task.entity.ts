@@ -5,63 +5,50 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-} from "typeorm";
-import { Comment } from "./comment.entity";
+} from 'typeorm'
+import { Comment } from './comment.entity'
+import { Priority, Status } from '@collab-task-management/types'
 
-export enum Priority {
-  LOW = "LOW",
-  MEDIUM = "MEDIUM",
-  HIGH = "HIGH",
-  URGENT = "URGENT",
-}
-
-export enum Status {
-  TODO = "TODO",
-  IN_PROGRESS = "IN_PROGRESS",
-  REVIEW = "REVIEW",
-  DONE = "DONE",
-}
-
-@Entity("tasks")
+@Entity('tasks')
 export class Task {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string
 
   @Column()
-  title: string;
+  title: string
 
-  @Column({ type: "text", nullable: true })
-  description: string;
+  @Column({ type: 'text' })
+  description: string
 
-  @Column({ type: "timestamp", nullable: true })
-  deadline: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  deadline: Date
 
   @OneToMany(() => Comment, (comment) => comment.task)
-  comments: Comment[];
+  comments: Comment[]
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: Priority,
     default: Priority.MEDIUM,
   })
-  priority: Priority;
+  priority: Priority
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: Status,
     default: Status.TODO,
   })
-  status: Status;
+  status: Status
 
-  @Column({ type: "uuid" })
-  authorId: string;
+  @Column({ type: 'uuid' })
+  authorId: string
 
-  @Column({ type: "simple-array", nullable: true })
-  assigneesIds: string[];
+  @Column({ type: 'simple-array', nullable: true })
+  assigneesIds: string[]
 
-  @CreateDateColumn({ name: "created_at" })
-  createdAt: Date;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date
 
-  @UpdateDateColumn({ name: "updated_at" })
-  updatedAt: Date;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date
 }

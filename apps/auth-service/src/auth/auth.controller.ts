@@ -1,27 +1,30 @@
-import { Controller } from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
-import { RegisterUserDto, LoginUserDto } from "@collab-task-management/types";
 import { AuthService } from "./auth.service";
+import { Controller } from "@nestjs/common";
+import {
+  RegisterUserDto,
+  LoginUserDto,
+  RefreshTokenDto,
+} from "@collab-task-management/types";
 
-@Controller("auth")
+@Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @MessagePattern("auth.register")
+  @MessagePattern("auth_register")
   async handleRegister(@Payload() data: RegisterUserDto) {
-    console.log("Register Payload: ", data);
-    try {
-      const newUser = await this.authService.create(data);
-      return newUser;
-    } catch (error) {
-      console.error("Error on create user: ", error);
-      throw error;
-    }
+    const create = await this.authService.create(data);
+    return create;
   }
 
-  @MessagePattern("auth.login")
-  handleLogin(@Payload() data: LoginUserDto) {
-    console.log("Login Payload: ", data);
-    return { message: "Success login!", accessToken: "..." };
+  @MessagePattern("auth_login")
+  async handleLogin(@Payload() data: LoginUserDto) {
+    const { email, password } = data;
+    return await this.authService.login({ email, password });
+  }
+
+  @MessagePattern("refresh")
+  async refreshToken(@Payload() refreshToken: RefreshTokenDto) {
+    return await this.authService.refresh(refreshToken);
   }
 }

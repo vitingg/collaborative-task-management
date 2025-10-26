@@ -1,13 +1,62 @@
-import { Body, Controller, Post } from '@nestjs/common'
-import { RegisterUserDto } from '@collab-task-management/types'
-import { TasksService } from './tasks.service'
+import { ClientProxy } from '@nestjs/microservices'
+import { CreateTaskDto } from 'dist'
+import { lastValueFrom } from 'rxjs'
+import { PaginationDto } from '@collab-task-management/types'
+import {
+  Body,
+  Controller,
+  Inject,
+  Post,
+  Get,
+  Put,
+  Delete,
+  Query,
+  Param,
+} from '@nestjs/common'
 
-@Controller()
+@Controller('tasks')
 export class TasksControllers {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(
+    @Inject('TASKS_SERVICE') private readonly authClient: ClientProxy
+  ) {}
 
   @Post()
-  createTask(@Body() taskData: RegisterUserDto) {
-    return this.tasksService.createTask(taskData)
+  async createTask(@Body() taskData: CreateTaskDto) {
+    const newService: CreateTaskDto = await lastValueFrom(
+      this.authClient.send('create_task', taskData)
+    )
+    return newService
+  }
+
+  @Get(':id')
+  async getOneTask(@Param('id') taskId: string) {
+    const getAllService: CreateTaskDto[] = await lastValueFrom(
+      this.authClient.send('get_one_task', taskId)
+    )
+    return getAllService
+  }
+
+  @Get()
+  async allTasks(@Query() paginationDto: PaginationDto) {
+    const getAllService: CreateTaskDto[] = await lastValueFrom(
+      this.authClient.send('get_all_tasks', paginationDto)
+    )
+    return getAllService
+  }
+
+  @Put(':id')
+  async updateTask(@Param('id') @Body() userId: string) {
+    const update: CreateTaskDto = await lastValueFrom(
+      this.authClient.send('update_task', userId)
+    )
+    return update
+  }
+
+  @Delete(':id')
+  async deleteTask(@Param('id') taskId: string) {
+    const deleteTask: CreateTaskDto = await lastValueFrom(
+      this.authClient.send('delete_task', taskId)
+    )
+    return deleteTask
   }
 }

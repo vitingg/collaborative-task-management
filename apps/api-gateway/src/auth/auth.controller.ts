@@ -1,7 +1,20 @@
-import { Controller, Get, Post, Body, Param, Inject } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { lastValueFrom } from 'rxjs'
-import { RegisterUserDto } from '@collab-task-management/types'
+import {
+  Controller,
+  Post,
+  Body,
+  Inject,
+  HttpCode,
+  HttpStatus,
+  HttpException,
+  InternalServerErrorException,
+} from '@nestjs/common'
+import {
+  RegisterUserDto,
+  LoginUserDto,
+  RefreshTokenDto,
+} from '@collab-task-management/types'
 
 @Controller('auth')
 export class AuthController {
@@ -12,24 +25,46 @@ export class AuthController {
   @Post('register')
   async createUser(@Body() registerUserDto: RegisterUserDto) {
     console.log('Gateway received request to create user')
-
-    const pattern = 'auth_register'
-    const payload = registerUserDto
-
     const newUser: RegisterUserDto = await lastValueFrom(
-      this.authClient.send(pattern, payload)
+      this.authClient.send('auth_register', registerUserDto)
     )
     return newUser
   }
 
-  @Get(':id')
-  async getUser(@Param('id') id: string) {
-    console.log('Gateway received request for user:', id)
-    const pattern = 'get_user_by_id'
-    const payload = { userId: id }
-    const user: RegisterUserDto = await lastValueFrom(
-      this.authClient.send(pattern, payload)
-    )
-    return user
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  async loginUser(@Body() data: LoginUserDto) {
+    try {
+      const login: LoginUserDto = await lastValueFrom(
+        this.authClient.send('auth_login', data)
+      )
+      return login
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: 'Invalid Credentials...',
+        },
+        HttpStatus.FORBIDDEN,
+        {
+          cause: error,
+        }
+      )
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  async refreshToken(@Body() refreshToken: RefreshTokenDto) {
+    try {
+      const payload: string = await lastValueFrom(
+        this.authClient.send('refresh', refreshToken)
+      )
+
+      return payload
+    } catch (error) {
+      console.error('Error communicating with auth service:', error)
+      throw new InternalServerErrorException('Error processing request')
+    }
   }
 }

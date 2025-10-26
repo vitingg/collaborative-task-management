@@ -19,26 +19,6 @@
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./dtos/auth/register-user": {
-      "import": "./dist/dtos/auth/register-user.mjs",
-      "require": "./dist/dtos/auth/register-user.js",
-      "types": "./dist/dtos/auth/register-user.d.ts"
-    },
-    "./dtos/auth/login-user": {
-      "import": "./dist/dtos/auth/login-user.mjs",
-      "require": "./dist/dtos/auth/login-user.js",
-      "types": "./dist/dtos/auth/login-user.d.ts"
-    },
-    "./dtos/tasks/create-task": {
-      "import": "./dist/dtos/tasks/create-task.mjs",
-      "require": "./dist/dtos/tasks/create-task.js",
-      "types": "./dist/dtos/tasks/create-task.d.ts"
-    },
-    "./dtos/tasks/update-task": {
-      "import": "./dist/dtos/tasks/update-task.mjs",
-      "require": "./dist/dtos/tasks/update-task.js",
-      "types": "./dist/dtos/tasks/update-task.d.ts"
-    },
     "./entities/task.enums": {
       "import": "./dist/entities/task.enums.mjs",
       "require": "./dist/entities/task.enums.js",

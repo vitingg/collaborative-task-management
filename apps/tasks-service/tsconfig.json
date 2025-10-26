@@ -5,8 +5,6 @@
   },
   "include": [
     "src/**/*",
-    "../../packages/types/src/dtos/tasks/create-task.dto.ts",
-    "../../packages/types/src/dtos/tasks/update-task.dto.ts"
   ],
   "exclude": [
     "node_modules",

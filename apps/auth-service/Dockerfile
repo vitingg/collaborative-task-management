@@ -14,5 +14,4 @@ COPY packages/types/package*.json ./packages/types/
 
 RUN npm install
 
-
 COPY . .

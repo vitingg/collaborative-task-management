@@ -1,34 +1,34 @@
-import { TasksService } from "./tasks.service";
-import { Controller } from "@nestjs/common";
-import { MessagePattern, Payload } from "@nestjs/microservices";
-import { CreateTaskDto, UpdateTaskDto } from "@collab-task-management/types";
+import { TasksService } from './tasks.service'
+import { Controller } from '@nestjs/common'
+import { MessagePattern, Payload } from '@nestjs/microservices'
+import { CreateTaskDto, UpdateTaskDto } from '@collab-task-management/types'
 
 @Controller()
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
-  @MessagePattern({ cmd: "task.create" })
+  @MessagePattern('create_task')
   create(@Payload() createTaskDto: CreateTaskDto) {
-    return this.tasksService.create(createTaskDto);
+    return this.tasksService.create(createTaskDto)
   }
 
-  @MessagePattern({ cmd: "task.get.all" })
+  @MessagePattern('get_all_tasks')
   findAll() {
-    return this.tasksService.findAll();
+    return this.tasksService.findAll()
   }
 
-  @MessagePattern({ cmd: "task.get.one" })
-  findOne(@Payload() id: string) {
-    return this.tasksService.findOne(id);
+  @MessagePattern('get_one_task')
+  findOne(@Payload() taskId: string) {
+    return this.tasksService.findOne(taskId)
   }
 
-  @MessagePattern({ cmd: "task.update" })
+  @MessagePattern('update_task')
   update(@Payload() payload: { id: string; dto: UpdateTaskDto }) {
-    return this.tasksService.update(payload.id, payload.dto);
+    return this.tasksService.update(payload.id, payload.dto)
   }
 
-  @MessagePattern({ cmd: "task.delete" })
+  @MessagePattern('delete_task')
   remove(@Payload() id: string) {
-    return this.tasksService.remove(id);
+    return this.tasksService.remove(id)
   }
 }
