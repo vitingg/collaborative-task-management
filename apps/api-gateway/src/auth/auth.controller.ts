@@ -1,6 +1,11 @@
 import { ClientProxy } from '@nestjs/microservices'
 import { lastValueFrom } from 'rxjs'
 import {
+  RegisterUserDto,
+  LoginUserDto,
+  RefreshTokenDto,
+} from '@collab-task-management/types'
+import {
   Controller,
   Post,
   Body,
@@ -10,11 +15,6 @@ import {
   HttpException,
   InternalServerErrorException,
 } from '@nestjs/common'
-import {
-  RegisterUserDto,
-  LoginUserDto,
-  RefreshTokenDto,
-} from '@collab-task-management/types'
 
 @Controller('auth')
 export class AuthController {

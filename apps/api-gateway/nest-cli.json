@@ -5,7 +5,22 @@
   "entryFile": "main",
   "compilerOptions": {
     "deleteOutDir": true,
-    "watchAssets": true,
-    "outDir": "dist"
+    "watchAssets": true
+  },
+  "watchOptions": {
+    "exclude": [
+      "node_modules",
+      "dist",
+      ".git",
+      "**/node_modules/**",
+      "**/dist/**"
+    ]
+  },
+  "dev": {
+    "dependsOn": [
+      "^build"
+    ],
+    "cache": false,
+    "persistent": true
   }
 }

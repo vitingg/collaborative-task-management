@@ -1,5 +1,5 @@
 import { ClientProxy } from '@nestjs/microservices'
-import { CreateTaskDto } from 'dist'
+import { CreateTaskDto } from '@collab-task-management/types'
 import { lastValueFrom } from 'rxjs'
 import { PaginationDto } from '@collab-task-management/types'
 import {

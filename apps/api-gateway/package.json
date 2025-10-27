@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@collab-task-management/types": "*",
+    "@collab-task-management/types": "workspace:*",
     "@collab-task-management/eslint-config": "*",
     "@collab-task-management/prettier-config": "*",
     "@nestjs/common": "^11.0.1",

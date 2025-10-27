@@ -9,7 +9,7 @@ import {
   IsString,
   IsUUID,
 } from "class-validator";
-import { Priority, Status } from "src/entities/task.enums";
+import { Priority, Status } from "../../entities/task.enums";
 
 export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsString()

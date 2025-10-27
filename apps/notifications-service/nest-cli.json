@@ -5,5 +5,14 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "watchAssets": true
+  },
+  "watchOptions": {
+    "exclude": [
+      "node_modules",
+      "dist",
+      ".git",
+      "**/node_modules/**",
+      "**/dist/**"
+    ]
   }
 }
