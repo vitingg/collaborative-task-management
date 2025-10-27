@@ -1,13 +1,15 @@
-import { Module } from '@nestjs/common'
-import { TasksModule } from './tasks/tasks.module'
+import { Comment } from './comment/entities/comment.entity'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
+import { CommentModule } from './comment/comment.module'
 import { Task } from './tasks/entities/task.entity'
-import { Comment } from './tasks/entities/comment.entity'
+import { TasksModule } from './tasks/tasks.module'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Module } from '@nestjs/common'
 
 @Module({
   imports: [
     TasksModule,
+    CommentModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

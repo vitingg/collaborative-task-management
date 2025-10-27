@@ -1,3 +1,5 @@
+import { Comment } from '../../comment/entities/comment.entity'
+import { Priority, Status } from '@collab-task-management/types'
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,8 +8,6 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm'
-import { Comment } from './comment.entity'
-import { Priority, Status } from '@collab-task-management/types'
 
 @Entity('tasks')
 export class Task {

@@ -1,21 +1,23 @@
 import { Controller, Get, Post, Body, Param, Inject } from '@nestjs/common'
+import { CreateCommentDto } from '@collab-task-management/types'
 import { ClientProxy } from '@nestjs/microservices'
 import { lastValueFrom } from 'rxjs'
 
 @Controller('tasks')
-export class NotificationController {
+export class CommentController {
   constructor(
-    @Inject('NOTIFICATION_SERVICE') private readonly userClient: ClientProxy
+    @Inject('COMMENTARY_SERVICE') private readonly userClient: ClientProxy
   ) {}
 
   @Post(':id/comments')
-  async createUser(@Body() createUserDto: any) {
+  async createUser(
+    @Param(':id') id: string,
+    @Body() createComment: CreateCommentDto
+  ) {
     console.log('Gateway received request to create user')
-
-    const pattern = 'create_user'
-    const payload = createUserDto
-
-    const newUser = await lastValueFrom(this.userClient.send(pattern, payload))
+    const newUser = await lastValueFrom(
+      this.userClient.send('task-comment-created', createComment)
+    )
     return newUser
   }
 

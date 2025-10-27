@@ -1,3 +1,4 @@
+import { Priority, Status } from "../../entities/task.enums";
 import {
   IsString,
   IsNotEmpty,
@@ -7,7 +8,6 @@ import {
   IsUUID,
   IsArray,
 } from "class-validator";
-import { Priority, Status } from "../../entities/task.enums";
 
 export class CreateTaskDto {
   @IsString()

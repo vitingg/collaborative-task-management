@@ -20,9 +20,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@collab-task-management/types": "workspace:*",
     "@collab-task-management/eslint-config": "*",
     "@collab-task-management/prettier-config": "*",
+    "@collab-task-management/types": "*",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -30,10 +30,8 @@
     "@nestjs/microservices": "^11.1.7",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/platform-socket.io": "^11.1.7",
     "@nestjs/swagger": "^11.2.1",
     "@nestjs/throttler": "^6.4.0",
-    "@nestjs/websockets": "^11.1.7",
     "amqp-connection-manager": "^5.0.0",
     "amqplib": "^0.10.9",
     "bcrypt": "^6.0.0",

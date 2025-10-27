@@ -4,7 +4,9 @@
     "outDir": "dist"
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../../packages/types/src/dtos/comment/create-commentary.dto.ts",
+    "../../packages/types/src/dtos/comment/update-notification.dto.ts"
   ],
   "exclude": [
     "node_modules",

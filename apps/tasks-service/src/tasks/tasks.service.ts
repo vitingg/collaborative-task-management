@@ -1,17 +1,15 @@
-import { Injectable } from '@nestjs/common'
 import { CreateTaskDto, UpdateTaskDto } from '@collab-task-management/types'
+import { Comment } from '../comment/entities/comment.entity'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
 import { Task } from './entities/task.entity'
-import { Comment } from './entities/comment.entity'
+import { Injectable } from '@nestjs/common'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task)
-    private readonly taskRepository: Repository<Task>,
-    @InjectRepository(Comment)
-    private readonly commentRepository: Repository<Comment>
+    private readonly taskRepository: Repository<Task>
   ) {}
 
   async create(createTaskDto: CreateTaskDto): Promise<Task> {
