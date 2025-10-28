@@ -17,13 +17,13 @@ import {
 @Controller('tasks')
 export class TasksControllers {
   constructor(
-    @Inject('TASKS_SERVICE') private readonly authClient: ClientProxy
+    @Inject('TASKS_SERVICE') private readonly taskClient: ClientProxy
   ) {}
 
   @Post()
   async createTask(@Body() taskData: CreateTaskDto) {
     const newService: CreateTaskDto = await lastValueFrom(
-      this.authClient.send('create_task', taskData)
+      this.taskClient.send('create_task', taskData)
     )
     return newService
   }
@@ -31,7 +31,7 @@ export class TasksControllers {
   @Get(':id')
   async getOneTask(@Param('id') taskId: string) {
     const getAllService: CreateTaskDto[] = await lastValueFrom(
-      this.authClient.send('get_one_task', taskId)
+      this.taskClient.send('get_one_task', taskId)
     )
     return getAllService
   }
@@ -39,7 +39,7 @@ export class TasksControllers {
   @Get()
   async allTasks(@Query() paginationDto: PaginationDto) {
     const getAllService: CreateTaskDto[] = await lastValueFrom(
-      this.authClient.send('get_all_tasks', paginationDto)
+      this.taskClient.send('get_all_tasks', paginationDto)
     )
     return getAllService
   }
@@ -47,7 +47,7 @@ export class TasksControllers {
   @Put(':id')
   async updateTask(@Param('id') @Body() userId: string) {
     const update: CreateTaskDto = await lastValueFrom(
-      this.authClient.send('update_task', userId)
+      this.taskClient.send('update_task', userId)
     )
     return update
   }
@@ -55,7 +55,7 @@ export class TasksControllers {
   @Delete(':id')
   async deleteTask(@Param('id') taskId: string) {
     const deleteTask: CreateTaskDto = await lastValueFrom(
-      this.authClient.send('delete_task', taskId)
+      this.taskClient.send('delete_task', taskId)
     )
     return deleteTask
   }
