@@ -1,8 +1,7 @@
 import { CreateCommentDto } from '@collab-task-management/types'
 import { ClientProxy } from '@nestjs/microservices'
 import { lastValueFrom } from 'rxjs'
-import { type Request } from 'express'
-
+import { JwtAuthGuard } from '../auth/jwt.auth.guard'
 import {
   Controller,
   Get,
@@ -14,7 +13,6 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common'
-import { JwtAuthGuard } from '../auth/jwt.auth.guard'
 
 interface Requests {
   user: {
@@ -37,7 +35,7 @@ export class CommentController {
     @Body() createComment: CreateCommentDto
   ) {
     if (!req.user) {
-      throw new Error('a')
+      throw new Error('Dont´t find any user from token.')
     }
     const authorId = req.user.id
 
