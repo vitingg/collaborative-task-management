@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { publicApi } from "@/services/public-api";
 
 const registerSchema = z.object({
   username: z.string().min(3, { message: "Nome de usuário inválido." }),
@@ -40,8 +41,14 @@ function Register() {
   const passwordError = errors.password?.message;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function handleRegister(data: any) {
-    console.log(data);
+  async function handleRegister(data: registerSchemaInfer) {
+    try {
+      const response = await publicApi.post("/auth/register", data);
+      console.log(response.data);
+      alert("conta criada");
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (

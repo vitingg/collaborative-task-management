@@ -1,7 +1,12 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { FooterCard } from "../-components/footer-card";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { publicApi } from "@/services/public-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createFileRoute } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import z from "zod";
 import {
   Card,
   CardContent,
@@ -9,10 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FooterCard } from "../-components/footer-card";
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 export const Route = createFileRoute("/_auth/_layout/login")({
   component: Login,
@@ -38,9 +39,10 @@ function Login() {
   const passwordError = errors.password?.message;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function handleLogin(data: any) {
+  async function handleLogin(data: loginSchemaInfer) {
     try {
-      console.log(data);
+      const response = await publicApi.post("/auth/login", data);
+      console.log(response.data);
     } catch (error) {
       console.log(error);
     }

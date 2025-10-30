@@ -1,0 +1,103 @@
+import axios, { AxiosError } from "axios";
+import { useAuthStore } from "@/stores/auth-store";
+import { publicApi } from "./public-api";
+
+let isRefreshing = false;
+
+let failedQueue: Array<{
+  resolve: (value: any) => void;
+  reject: (reason: any) => void;
+}> = [];
+
+const processQueue = (
+  error: AxiosError | null,
+  token: string | null = null
+) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+const apiPrivate = axios.create();
+
+apiPrivate.defaults.baseURL = publicApi.defaults.baseURL;
+
+apiPrivate.interceptors.request.use(
+  (config) => {
+    const { token } = useAuthStore.getState();
+
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+apiPrivate.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error: AxiosError) => {
+    const originalRequest = error.config as any;
+
+    if (
+      error.response?.status !== 401 ||
+      originalRequest.url === "/auth/refresh"
+    ) {
+      return Promise.reject(error);
+    }
+
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      })
+        .then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return apiPrivate(originalRequest);
+        })
+        .catch((err) => {
+          return Promise.reject(err);
+        });
+    }
+
+    isRefreshing = true;
+    const { refreshToken, logout, setToken } = useAuthStore.getState();
+
+    if (!refreshToken) {
+      logout();
+      return Promise.reject(error);
+    }
+
+    try {
+      const response = await publicApi.post("/auth/refresh", { refreshToken });
+
+      const { token: newAccessToken, refreshToken: newRefreshToken } =
+        response.data;
+
+      setToken(newAccessToken, newRefreshToken);
+
+      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+      processQueue(null, newAccessToken);
+
+      return apiPrivate(originalRequest);
+    } catch (refreshError: any) {
+      processQueue(refreshError, null);
+      logout();
+
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
+  }
+);
+
+export default apiPrivate;

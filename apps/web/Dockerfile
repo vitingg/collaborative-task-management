@@ -14,7 +14,6 @@
   COPY packages/types/package*.json ./packages/types/
 
   RUN npm install
-  RUN npm install --prefix ./apps/web
 
   COPY . .
 

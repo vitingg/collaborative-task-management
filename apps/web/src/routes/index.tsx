@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-
-const navigate = useNavigate();
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  component: () => {
-    navigate({ to: "/register" });
+  loader: () => {
+    throw redirect({
+      to: "/register",
+    });
   },
 });
