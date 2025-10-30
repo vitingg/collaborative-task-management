@@ -1,4 +1,7 @@
-import { CreateCommentDto } from '@collab-task-management/types'
+import {
+  CreateCommentDto,
+  type PaginationDto,
+} from '@collab-task-management/types'
 import { ClientProxy } from '@nestjs/microservices'
 import { lastValueFrom } from 'rxjs'
 import { JwtAuthGuard } from '../auth/jwt.auth.guard'
@@ -34,9 +37,6 @@ export class CommentController {
     @Param('id') taskId: string,
     @Body() createComment: CreateCommentDto
   ) {
-    if (!req.user) {
-      throw new Error('Dont´t find any user from token.')
-    }
     const authorId = req.user.id
 
     console.log('Gateway received request to create a commentary.')
@@ -47,7 +47,7 @@ export class CommentController {
         authorId,
       },
     }
-    const newComment = await lastValueFrom(
+    const newComment: CreateCommentDto = await lastValueFrom(
       this.commentsClient.send('task-comment-created', payload)
     )
 
@@ -56,14 +56,12 @@ export class CommentController {
 
   @Get(':id/comments')
   async getComments(
-    @Param('id') id: string,
-    @Query('page') page: string,
-    @Query('size') size: string
+    @Param('id') taskId: string,
+    @Query() pagination: PaginationDto
   ) {
     const payload = {
-      id: id,
-      page: page,
-      size: size,
+      taskId,
+      pagination,
     }
     const getComments: CreateCommentDto[] = await lastValueFrom(
       this.commentsClient.send('get-all-commented-task', payload)

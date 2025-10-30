@@ -1,7 +1,7 @@
-import { CreateCommentDto } from '@collab-task-management/types'
 import { MessagePattern, Payload } from '@nestjs/microservices'
 import { CommentService } from './comment.service'
-import { Controller, Body } from '@nestjs/common'
+import { Controller } from '@nestjs/common'
+import type { PaginationDto } from 'dist'
 
 @Controller()
 export class CommentController {
@@ -24,7 +24,7 @@ export class CommentController {
   }
 
   @MessagePattern('get-all-commented-task')
-  findAll(@Payload() payload: { id: string; page: string; size: string }) {
+  findAll(@Payload() payload: { taskId: string; pagination: PaginationDto }) {
     const findAllComments = this.commentsService.findAll(payload)
     return findAllComments
   }

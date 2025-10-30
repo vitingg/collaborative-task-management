@@ -1,5 +1,8 @@
 import { ClientProxy } from '@nestjs/microservices'
-import { CreateTaskDto } from '@collab-task-management/types'
+import {
+  CreateTaskDto,
+  type UpdateTaskDto,
+} from '@collab-task-management/types'
 import { lastValueFrom } from 'rxjs'
 import { PaginationDto } from '@collab-task-management/types'
 import {
@@ -12,7 +15,17 @@ import {
   Delete,
   Query,
   Param,
+  UseGuards,
+  Req,
 } from '@nestjs/common'
+import { JwtAuthGuard } from '../auth/jwt.auth.guard'
+
+interface Requests {
+  user: {
+    id: string
+    email: string
+  }
+}
 
 @Controller('tasks')
 export class TasksControllers {
@@ -45,9 +58,21 @@ export class TasksControllers {
   }
 
   @Put(':id')
-  async updateTask(@Param('id') @Body() userId: string) {
-    const update: CreateTaskDto = await lastValueFrom(
-      this.taskClient.send('update_task', userId)
+  @UseGuards(JwtAuthGuard)
+  async updateTask(
+    @Req() req: Requests,
+    @Param('id') taskId: string,
+    @Body() taskData: UpdateTaskDto
+  ) {
+    const authorId = req.user.id
+    console.log(authorId)
+    const payload = {
+      taskId,
+      taskData,
+      authorId,
+    }
+    const update: UpdateTaskDto = await lastValueFrom(
+      this.taskClient.send('update_task', payload)
     )
     return update
   }

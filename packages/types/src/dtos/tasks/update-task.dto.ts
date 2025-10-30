@@ -1,5 +1,4 @@
-import { PartialType } from "@nestjs/mapped-types";
-import { CreateTaskDto } from "./create-task.dto";
+import { Priority, Status } from "../../entities/task.enums";
 import {
   IsArray,
   IsDateString,
@@ -9,9 +8,8 @@ import {
   IsString,
   IsUUID,
 } from "class-validator";
-import { Priority, Status } from "../../entities/task.enums";
 
-export class UpdateTaskDto extends PartialType(CreateTaskDto) {
+export class UpdateTaskDto {
   @IsString()
   @IsNotEmpty()
   title: string;

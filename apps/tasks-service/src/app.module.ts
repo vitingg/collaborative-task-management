@@ -8,8 +8,6 @@ import { Module } from '@nestjs/common'
 
 @Module({
   imports: [
-    TasksModule,
-    CommentModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -29,6 +27,8 @@ import { Module } from '@nestjs/common'
         synchronize: true, // comentario: true em dev
       }),
     }),
+    TasksModule,
+    CommentModule,
   ],
   controllers: [],
   providers: [],

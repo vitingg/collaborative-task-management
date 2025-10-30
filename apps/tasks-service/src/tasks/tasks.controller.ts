@@ -1,7 +1,11 @@
 import { TasksService } from './tasks.service'
 import { Controller } from '@nestjs/common'
 import { MessagePattern, Payload } from '@nestjs/microservices'
-import { CreateTaskDto, UpdateTaskDto } from '@collab-task-management/types'
+import {
+  CreateTaskDto,
+  UpdateTaskDto,
+  type PaginationDto,
+} from '@collab-task-management/types'
 
 @Controller()
 export class TasksController {
@@ -13,8 +17,8 @@ export class TasksController {
   }
 
   @MessagePattern('get_all_tasks')
-  findAll() {
-    return this.tasksService.findAll()
+  findAll(@Payload() pagination: PaginationDto) {
+    return this.tasksService.findAll(pagination)
   }
 
   @MessagePattern('get_one_task')
@@ -23,8 +27,15 @@ export class TasksController {
   }
 
   @MessagePattern('update_task')
-  update(@Payload() payload: { id: string; dto: UpdateTaskDto }) {
-    return this.tasksService.update(payload.id, payload.dto)
+  update(
+    @Payload()
+    payload: {
+      taskId: string
+      taskData: UpdateTaskDto
+      authorId: string
+    }
+  ) {
+    return this.tasksService.update(payload)
   }
 
   @MessagePattern('delete_task')
