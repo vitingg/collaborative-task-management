@@ -1,10 +1,8 @@
-import { ClientProxy } from '@nestjs/microservices'
-import {
-  CreateTaskDto,
-  type UpdateTaskDto,
-} from '@collab-task-management/types'
-import { lastValueFrom } from 'rxjs'
+import { CreateTaskDto, UpdateTaskDto } from '@collab-task-management/types'
 import { PaginationDto } from '@collab-task-management/types'
+import { JwtAuthGuard } from '../auth/jwt.auth.guard'
+import { ClientProxy } from '@nestjs/microservices'
+import { lastValueFrom } from 'rxjs'
 import {
   Body,
   Controller,
@@ -17,8 +15,16 @@ import {
   Param,
   UseGuards,
   Req,
+  Request,
 } from '@nestjs/common'
-import { JwtAuthGuard } from '../auth/jwt.auth.guard'
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 
 interface Requests {
   user: {
@@ -27,6 +33,7 @@ interface Requests {
   }
 }
 
+@ApiTags('Tasks')
 @Controller('tasks')
 export class TasksControllers {
   constructor(
@@ -34,14 +41,27 @@ export class TasksControllers {
   ) {}
 
   @Post()
-  async createTask(@Body() taskData: CreateTaskDto) {
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Cria uma nova tarefa' })
+  @ApiResponse({ status: 201, description: 'Tarefa criada com sucesso' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  async createTask(@Body() taskData: CreateTaskDto, @Request() req: Requests) {
+    const payload = {
+      authorId: req.user.id,
+      taskData,
+    }
     const newService: CreateTaskDto = await lastValueFrom(
-      this.taskClient.send('create_task', taskData)
+      this.taskClient.send('create_task', payload)
     )
     return newService
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Busca uma tarefa específica pelo ID' })
+  @ApiParam({ name: 'id', description: 'ID da tarefa' })
+  @ApiResponse({ status: 200, description: 'Tarefa encontrada' })
+  @ApiResponse({ status: 404, description: 'Tarefa não encontrada' })
   async getOneTask(@Param('id') taskId: string) {
     const getAllService: CreateTaskDto[] = await lastValueFrom(
       this.taskClient.send('get_one_task', taskId)
@@ -50,6 +70,10 @@ export class TasksControllers {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Lista todas as tarefas com paginação' })
+  @ApiQuery({ name: 'page', required: false, description: 'Número da página' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Itens por página' })
+  @ApiResponse({ status: 200, description: 'Lista de tarefas retornada' })
   async allTasks(@Query() paginationDto: PaginationDto) {
     const getAllService: CreateTaskDto[] = await lastValueFrom(
       this.taskClient.send('get_all_tasks', paginationDto)
@@ -59,13 +83,22 @@ export class TasksControllers {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Atualiza uma tarefa (requer autoria)' })
+  @ApiParam({ name: 'id', description: 'ID da tarefa a ser atualizada' })
+  @ApiResponse({ status: 200, description: 'Tarefa atualizada com sucesso' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({
+    status: 403,
+    description: 'Acesso negado (usuário não é o autor)',
+  })
+  @ApiResponse({ status: 404, description: 'Tarefa não encontrada' })
   async updateTask(
     @Req() req: Requests,
     @Param('id') taskId: string,
     @Body() taskData: UpdateTaskDto
   ) {
     const authorId = req.user.id
-    console.log(authorId)
     const payload = {
       taskId,
       taskData,
@@ -78,6 +111,14 @@ export class TasksControllers {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Deleta uma tarefa (requer autoria)' })
+  @ApiParam({ name: 'id', description: 'ID da tarefa a ser deletada' })
+  @ApiResponse({ status: 200, description: 'Tarefa deletada com sucesso' })
+  @ApiResponse({ status: 401, description: 'Não autorizado' })
+  @ApiResponse({ status: 403, description: 'Acesso negado' })
+  @ApiResponse({ status: 404, description: 'Tarefa não encontrada' })
   async deleteTask(@Param('id') taskId: string) {
     const deleteTask: CreateTaskDto = await lastValueFrom(
       this.taskClient.send('delete_task', taskId)

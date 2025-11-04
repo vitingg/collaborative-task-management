@@ -5,6 +5,8 @@ import { Task } from './tasks/entities/task.entity'
 import { TasksModule } from './tasks/tasks.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Module } from '@nestjs/common'
+import { AuditLogModule } from './audit-log/audit-log.module'
+import { AuditLog } from './audit-log/entities/audit-log.entity'
 
 @Module({
   imports: [
@@ -23,12 +25,13 @@ import { Module } from '@nestjs/common'
         username: configService.get<string>('POSTGRES_USER', 'postgres'),
         password: configService.get<string>('POSTGRES_PASSWORD', 'password'),
         database: configService.get<string>('POSTGRES_DB', 'challenge_db'),
-        entities: [Task, Comment],
+        entities: [Task, Comment, AuditLog],
         synchronize: true, // comentario: true em dev
       }),
     }),
     TasksModule,
     CommentModule,
+    AuditLogModule,
   ],
   controllers: [],
   providers: [],

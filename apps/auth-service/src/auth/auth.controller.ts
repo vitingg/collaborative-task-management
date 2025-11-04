@@ -27,4 +27,13 @@ export class AuthController {
   async refreshToken(@Payload() refreshToken: RefreshTokenDto) {
     return await this.authService.refresh(refreshToken);
   }
+
+  @MessagePattern("get-users")
+  async getAllUsers() {
+    const users = await this.authService.findAllUsers();
+
+    console.log("Chego");
+    console.log(users);
+    return users;
+  }
 }

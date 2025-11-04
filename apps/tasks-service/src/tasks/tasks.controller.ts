@@ -7,13 +7,18 @@ import {
   type PaginationDto,
 } from '@collab-task-management/types'
 
+type createTaskPayload = {
+  authorId: string
+  taskData: CreateTaskDto
+}
+
 @Controller()
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @MessagePattern('create_task')
-  create(@Payload() createTaskDto: CreateTaskDto) {
-    return this.tasksService.create(createTaskDto)
+  create(@Payload() payload: createTaskPayload) {
+    return this.tasksService.create(payload)
   }
 
   @MessagePattern('get_all_tasks')

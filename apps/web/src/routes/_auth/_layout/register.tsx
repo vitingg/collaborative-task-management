@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
-import z from "zod";
+import { useRegister } from "@/services/auth/use-register";
+import {
+  registerSchema,
+  type registerSchemaInfer,
+} from "@/schemas/auth/register-schema";
 import {
   Card,
   CardContent,
@@ -13,21 +17,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { publicApi } from "@/services/public-api";
-
-const registerSchema = z.object({
-  username: z.string().min(3, { message: "Nome de usuário inválido." }),
-  email: z.email({ message: "Email inválido." }),
-  password: z.string().min(3, { message: "Senha inválida." }),
-});
-
-type registerSchemaInfer = z.infer<typeof registerSchema>;
 
 export const Route = createFileRoute("/_auth/_layout/register")({
   component: Register,
 });
 
 function Register() {
+  const { mutate: registerMutate } = useRegister();
+
   const {
     register,
     handleSubmit,
@@ -40,15 +37,8 @@ function Register() {
   const emailError = errors.email?.message;
   const passwordError = errors.password?.message;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function handleRegister(data: registerSchemaInfer) {
-    try {
-      const response = await publicApi.post("/auth/register", data);
-      console.log(response.data);
-      alert("conta criada");
-    } catch (error) {
-      console.log(error);
-    }
+    registerMutate(data);
   }
 
   return (

@@ -23,25 +23,11 @@ const processQueue = (
   failedQueue = [];
 };
 
-const apiPrivate = axios.create();
+const privateApi = axios.create();
 
-apiPrivate.defaults.baseURL = publicApi.defaults.baseURL;
+privateApi.defaults.baseURL = publicApi.defaults.baseURL;
 
-apiPrivate.interceptors.request.use(
-  (config) => {
-    const { token } = useAuthStore.getState();
-
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-apiPrivate.interceptors.response.use(
+privateApi.interceptors.response.use(
   (response) => {
     return response;
   },
@@ -50,22 +36,18 @@ apiPrivate.interceptors.response.use(
 
     if (
       error.response?.status !== 401 ||
-      originalRequest.url === "/auth/refresh"
+      originalRequest.url === "/auth/refresh" ||
+      originalRequest._retry
     ) {
       return Promise.reject(error);
     }
 
     if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        failedQueue.push({ resolve, reject });
-      })
-        .then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
-          return apiPrivate(originalRequest);
-        })
-        .catch((err) => {
-          return Promise.reject(err);
-        });
+      return new Promise((resolve, reject) => {}).then((token) => {
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        originalRequest._retry = true; //
+        return privateApi(originalRequest);
+      });
     }
 
     isRefreshing = true;
@@ -79,16 +61,16 @@ apiPrivate.interceptors.response.use(
     try {
       const response = await publicApi.post("/auth/refresh", { refreshToken });
 
-      const { token: newAccessToken, refreshToken: newRefreshToken } =
-        response.data;
+      const { token: newAccessToken } = response.data;
 
-      setToken(newAccessToken, newRefreshToken);
+      setToken({ token: newAccessToken });
 
       originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+      originalRequest._retry = true;
 
       processQueue(null, newAccessToken);
 
-      return apiPrivate(originalRequest);
+      return privateApi(originalRequest);
     } catch (refreshError: any) {
       processQueue(refreshError, null);
       logout();
@@ -100,4 +82,4 @@ apiPrivate.interceptors.response.use(
   }
 );
 
-export default apiPrivate;
+export { privateApi };

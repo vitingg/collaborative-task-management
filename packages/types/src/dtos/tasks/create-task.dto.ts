@@ -30,10 +30,6 @@ export class CreateTaskDto {
   @IsOptional()
   status?: Status;
 
-  @IsUUID()
-  @IsNotEmpty()
-  authorId: string;
-
   @IsArray()
   @IsUUID("all", { each: true })
   @IsOptional()

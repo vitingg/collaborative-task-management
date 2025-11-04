@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ConfigService } from "@nestjs/config";
 import { JwtPayload } from "jsonwebtoken";
@@ -24,6 +28,13 @@ export class AuthService {
   async create(
     createUserDto: RegisterUserDto
   ): Promise<Omit<User, "password">> {
+    const existingUser = await this.userRepository.findOne({
+      where: { username: createUserDto.username },
+    });
+    if (existingUser) {
+      throw new BadRequestException("Username already exists");
+    }
+
     const salt = await bcrypt.genSalt();
     const password_hash = await bcrypt.hash(createUserDto.password, salt);
 
@@ -31,6 +42,7 @@ export class AuthService {
       email: createUserDto.email,
       username: createUserDto.username,
       password: password_hash,
+      created_at: new Date(),
     });
     const savedUser = await this.userRepository.save(newUser);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -123,5 +135,20 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException(error);
     }
+  }
+
+  async findAllUsers(): Promise<Omit<User, "password">[]> {
+    const users = await this.userRepository.find({
+      select: {
+        id: true,
+        email: true,
+        username: true,
+      },
+    });
+    return users.map((user) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...safeUser } = user;
+      return safeUser;
+    });
   }
 }

@@ -1,6 +1,6 @@
-import { create } from "zustand";
+import type { UserProperties } from "@collab-task-management/types";
 import { persist } from "zustand/middleware";
-import { type UserProperties } from "@collab-task-management/types";
+import { create } from "zustand";
 
 interface AuthState {
   token: string | null;
@@ -10,10 +10,10 @@ interface AuthState {
 
   login: (data: {
     token: string;
-    refreshToken: string;
+    refresh: string;
     user: UserProperties;
   }) => void;
-  setToken: (token: string, refreshToken: string) => void;
+  setToken: (data: { token: string; refreshToken?: string }) => void;
   logout: () => void;
 }
 
@@ -28,16 +28,15 @@ export const useAuthStore = create(
       login: (data) =>
         set({
           token: data.token,
-          refreshToken: data.refreshToken,
+          refreshToken: data.refresh,
           user: data.user,
           isAuthenticated: true,
         }),
 
-      setToken: (token: string, refreshToken: string) =>
+      setToken: (data) =>
         set((state) => ({
-          ...state,
-          token,
-          refreshToken: refreshToken ?? state.refreshToken,
+          token: data.token,
+          refreshToken: data.refreshToken ?? state.refreshToken,
         })),
 
       logout: () =>

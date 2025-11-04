@@ -1,12 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { FooterCard } from "../-components/footer-card";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { publicApi } from "@/services/public-api";
+import { useAuthStore } from "@/stores/auth-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
-import z from "zod";
+import { toast } from "react-toastify";
+import { useLogin } from "@/services/auth/use-login";
 import {
   Card,
   CardContent,
@@ -14,19 +15,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  loginSchema,
+  loginSearchSchema,
+  type loginSchemaInfer,
+} from "@/schemas/auth/login-schema";
 
 export const Route = createFileRoute("/_auth/_layout/login")({
+  validateSearch: loginSearchSchema,
   component: Login,
 });
 
-const loginSchema = z.object({
-  email: z.email({ message: "Email inválido." }),
-  password: z.string().min(3, { message: "Senha inválida." }),
-});
-
-type loginSchemaInfer = z.infer<typeof loginSchema>;
-
 function Login() {
+  const { login } = useAuthStore();
+  const { redirect } = Route.useSearch();
+  const navigate = useNavigate();
+  const { mutate: loginMutate } = useLogin();
+
   const {
     register,
     handleSubmit,
@@ -38,14 +43,25 @@ function Login() {
   const emailError = errors.email?.message;
   const passwordError = errors.password?.message;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function handleLogin(data: loginSchemaInfer) {
-    try {
-      const response = await publicApi.post("/auth/login", data);
-      console.log(response.data);
-    } catch (error) {
-      console.log(error);
-    }
+  function onFormSubmit(data: loginSchemaInfer) {
+    loginMutate(data, {
+      onSuccess: (data) => {
+        login({
+          user: data.user,
+          token: data.token,
+          refresh: data.refresh,
+        });
+        toast.success("Login realizado com sucesso!");
+        navigate({
+          to: redirect || "/dashboard",
+          replace: true,
+        });
+      },
+      onError: (error) => {
+        toast.error("Falha ao tentar logar...");
+        console.log(error);
+      },
+    });
   }
 
   return (
@@ -59,17 +75,17 @@ function Login() {
         </CardHeader>
         <CardContent>
           <form
-            onSubmit={handleSubmit(handleLogin)}
+            onSubmit={handleSubmit(onFormSubmit)}
             className="flex flex-col gap-4 pt-4"
           >
-            <fieldset>
+            <fieldset className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input type="text" {...register("email")} />
               {emailError && (
                 <p className="text-red-500 text-sm">{emailError}</p>
               )}
             </fieldset>
-            <fieldset>
+            <fieldset className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input type="password" {...register("password")} />
               {passwordError && (
@@ -77,7 +93,7 @@ function Login() {
               )}
             </fieldset>
 
-            <Button className="w-full">salvar</Button>
+            <Button className="w-full">Salvar</Button>
           </form>
         </CardContent>
       </Card>

@@ -1,10 +1,10 @@
-import { InjectRepository } from '@nestjs/typeorm'
-import { Comment } from './entities/comment.entity'
 import { Inject, Injectable, NotFoundException } from '@nestjs/common'
-import { Repository } from 'typeorm'
-import { Task } from '../tasks/entities/task.entity'
 import { PaginationDto } from '@collab-task-management/types'
+import { Task } from '../tasks/entities/task.entity'
 import { ClientProxy } from '@nestjs/microservices'
+import { Comment } from './entities/comment.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class CommentService {
@@ -15,6 +15,7 @@ export class CommentService {
     private readonly taskRepository: Repository<Task>,
     @Inject('TASKS_SERVICE') private readonly rabbitClient: ClientProxy
   ) {}
+
   async create(payload: {
     taskId: string
     createComment: {
@@ -44,23 +45,14 @@ export class CommentService {
   }
 
   async findAll(payload: { taskId: string; pagination: PaginationDto }) {
-    const { taskId: taskId } = payload
-    const comment = await this.commentRepository.find({
-      where: {
-        taskId: taskId,
-      },
-    })
-    console.log(comment, payload.pagination.page)
-    if (!comment) {
-      throw new NotFoundException(
-        'Don`t find any comment with this credentials...'
-      )
-    }
-
+    const { taskId } = payload
     const { page, size } = payload.pagination
     const skip = (page - 1) * size
 
-    const [results, total] = await this.taskRepository.findAndCount({
+    const [results, total] = await this.commentRepository.findAndCount({
+      where: {
+        taskId: taskId,
+      },
       take: size,
       skip: skip,
       order: {

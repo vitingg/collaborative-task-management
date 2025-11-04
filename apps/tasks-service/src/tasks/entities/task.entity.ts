@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm'
+import { AuditLog } from '../../audit-log/entities/audit-log.entity'
 
 @Entity('tasks')
 export class Task {
@@ -32,6 +33,9 @@ export class Task {
     default: Priority.MEDIUM,
   })
   priority: Priority
+
+  @OneToMany(() => AuditLog, (log) => log.task)
+  auditLogs: AuditLog[]
 
   @Column({
     type: 'enum',
