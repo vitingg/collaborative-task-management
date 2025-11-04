@@ -1,20 +1,36 @@
-Sistema de Gestão de Tarefas Colaborativo
+<h1 align="center">🧩 Sistema de Gestão de Tarefas Colaborativo</h1>
 
-Este é um projeto full-stack de um sistema de gestão de tarefas colaborativo, construído com foco em escalabilidade e reatividade.
+<p align="center">
+  <strong>Um sistema full-stack de gestão de tarefas colaborativo, focado em escalabilidade e reatividade.</strong><br/>
+  Construído com <b>NestJS</b>, <b>RabbitMQ</b>, <b>React</b>, <b>Zustand</b> e <b>TanStack Router</b>.
+</p>
 
-O back-end utiliza uma arquitetura de microsserviços com NestJS e RabbitMQ para comunicação assíncrona. O front-end é construído em React (com Zustand e TanStack Router) e se comunica com o back-end via HTTP e WebSockets (Socket.io) para atualizações em tempo real.
+---
 
-O projeto é organizado como um Monorepo.
+## 📘 Sumário
 
-🏗️ Arquitetura
+1. [🏗️ Arquitetura](#-arquitetura)
+2. [🧠 Decisões Técnicas e Trade-offs](#-decisões-técnicas-e-trade-offs)
+3. [⏱️ Cronograma de Desenvolvimento](#️-cronograma-de-desenvolvimento)
+4. [⚠️ Problemas e Melhorias Futuras](#️-problemas-e-melhorias-futuras)
+5. [⚙️ Arquivos .env](#️-arquivos-env)
+6. [🚀 Instruções de Execução](#-instruções-de-execução)
 
-A arquitetura é dividida entre uma interface de cliente, um ponto de entrada de API (Gateway) e múltiplos microsserviços especializados. A comunicação acontece de duas formas:
+---
 
-    Síncrona (HTTP): Usada para operações que exigem uma resposta imediata (ex: Login, Registro).
+## 🏗️ Arquitetura
 
-    Assíncrona (RabbitMQ): Usada para comandos e eventos que podem ser processados em segundo plano (ex: Criar Tarefa, Adicionar Comentário), permitindo que a UI responda instantaneamente.
+O sistema é dividido entre:
+- **Interface cliente** (React)
+- **API Gateway** (NestJS)
+- **Microsserviços especializados** (Auth, Tasks, Comments)
 
-Snippet de código
+A comunicação ocorre de duas formas:
+
+- **Síncrona (HTTP)** — operações imediatas (Login, Registro)  
+- **Assíncrona (RabbitMQ)** — comandos e eventos em segundo plano (Criar Tarefa, Adicionar Comentário)
+
+### 🔹 Diagrama Simplificado
 
 ```text
 [ Cliente (React, Zustand, TanStack Router) ]
@@ -50,135 +66,107 @@ Snippet de código
                                     |
                                     `---> (Evento consumido pelo Gateway
                                            para notificar o cliente via Socket.io)
-```
 
-🧠 **Decisões Técnicas e Trade-offs**
+🧠 Decisões Técnicas e Trade-offs
+🔸 Monorepo vs. Multi-repo
 
-Durante o desenvolvimento, várias decisões de arquitetura foram tomadas:
+Decisão: Monorepo
+Prós:
 
-    Monorepo vs. Multi-repo:
+    Gerenciamento centralizado de dependências
 
-        Decisão: Utilizar um Monorepo.
+    Compartilhamento de código (DTOs, interfaces)
 
-        Trade-off (Pró): Gerenciamento centralizado de dependências, compartilhamento de código (ex: DTOs, interfaces) entre o front-end e os microsserviços, consistência de tooling.
+    Consistência entre serviços
 
-        Trade-off (Contra): Alta complexidade inicial de configuração, especialmente com paths do TypeScript e resolução de módulos entre os pacotes (um desafio enfrentado no Dia 4).
+Contras:
 
-    Comunicação de Microsserviços (HTTP vs. RabbitMQ para Auth):
+    Maior complexidade na configuração de paths TypeScript (problema resolvido no Dia 4)
 
-        Decisão: Usar uma abordagem híbrida.
+🔸 Comunicação entre Microsserviços
 
-        Trade-off (Contexto - Dia 2): Foi analisado o uso de RabbitMQ para autenticação (Login/Register). Usar RabbitMQ (padrão Request/Reply) eliminaria a dependência direta do Gateway com o serviço de Auth.
+Decisão: Abordagem híbrida — HTTP para Auth e RabbitMQ para Tasks/Comments
 
-        Trade-off (Conclusão): No entanto, operações de autenticação são inerentemente síncronas (o usuário precisa esperar a resposta). Usar um message broker para isso adiciona complexidade desnecessária. A decisão final foi usar HTTP síncrono (Gateway -> Serviço de Auth). Isso cria uma dependência de serviço, mas simplifica drasticamente o fluxo de autenticação, que é o comportamento esperado para essa operação.
+    Auth (HTTP): ideal para operações síncronas (login e registro).
 
-    Comunicação para Ações (Tasks/Comments):
+    Tasks/Comments (RabbitMQ): usado para operações CUD em background, garantindo resiliência.
 
-        Decisão: Usar RabbitMQ para operações de escrita (CUD - Create, Update, Delete).
+🔸 Reatividade (Socket.io)
 
-        Trade-off (Pró): Alta resiliência e performance percebida. O cliente envia a requisição (HTTP) ao Gateway, que a publica no RabbitMQ e retorna 201 Created ou 202 Accepted imediatamente. O processamento real (salvar no banco) acontece em background.
+Decisão: O Gateway gerencia as conexões WebSocket com o cliente.
 
-        Trade-off (Contra): O cliente precisa de um segundo canal (Socket.io) para receber a confirmação ou os dados atualizados quando o processamento for concluído.
+Prós:
 
-    Reatividade (Socket.io):
+    Experiência colaborativa em tempo real
 
-        Decisão: Integrar o Socket.io (provavelmente no Gateway) para reatividade em tempo real.
+Contras:
 
-        Trade-off (Pró): Permite uma experiência colaborativa. Quando o "Serviço de Tasks" termina de processar uma nova tarefa, ele emite um evento (via RabbitMQ) que o Gateway consome e retransmite ao cliente via WebSocket.
+    Complexidade no gerenciamento de múltiplas conexões e escalabilidade
 
-        Trade-off (Contra): Gerenciamento de estado de conexão e escalabilidade dos sockets (se houver múltiplas instâncias do Gateway).
+⏱️ Cronograma de Desenvolvimento
+Fase	Descrição	Dias
+Backend - Fundamentos	Estrutura inicial do Monorepo, CRUD básico (Register), microsserviços iniciais	1–3
+Backend - Débito Técnico	Correção de paths, modules e configurações TypeScript	4
+Backend - Real-Time	Implementação do Socket.io e lógica de negócio	5–6
+Frontend - Integração e UI	Login/Register, Dashboard, CRUD de Tasks, Audit Logs e reatividade	6–14
+⚠️ Problemas e Melhorias Futuras
 
-⏱️ Cronograma e Tempo Gasto
+    Configuração de Paths: tsconfig.json ainda exige ajustes manuais.
 
-O projeto foi dividido em duas fases principais (Backend e Frontend):
+    Audit Logs: criar um microsserviço dedicado (audit-service) para registrar eventos do RabbitMQ.
 
-Dias 1-3: Backend (Fundação e Configuração)
+    Testes: implementar testes unitários e E2E para microsserviços e integração.
 
-    Scaffolding e configuração inicial do Monorepo.
+⚙️ Arquivos .env
 
-    Desenvolvimento do primeiro CRUD (Register) e adaptação à arquitetura do NestJS e OOP.
+Cada serviço possui suas próprias variáveis de ambiente.
+📦 apps/api-gateway/.env
 
-    Estudo inicial da separação de responsabilidades em microsserviços.
+JWT_SECRET=seu_token_aqui
 
-Dia 4: Backend (Débito Técnico/Configuração)
+🔐 apps/auth-service/.env
 
-    Foco intenso em depuração de problemas do Monorepo.
+JWT_SECRET=seu_token_aqui
+JWT_REFRESH=seu_refresh_token_aqui
 
-    Resolução de paths do TypeScript, módulos não encontrados e leitura de documentação para estabilizar o ambiente de desenvolvimento.
+    ⚠️ Os demais serviços não requerem variáveis específicas no momento.
 
-Dias 5-6: Backend (Lógica e Real-Time)
+🚀 Instruções de Execução
 
-    Criação de rotas e lógicas de negócio.
+Este projeto é um monorepo com múltiplos microsserviços e um cliente React.
+Siga os passos abaixo para executar corretamente o sistema:
+1️⃣ Dependências Externas
 
-    Início da análise de responsabilidade e implementação do Socket.io para comunicação em tempo real.
+Certifique-se de que Docker e Docker Compose estão instalados.
+O projeto depende de PostgreSQL e RabbitMQ, inicializados via Docker.
 
-Dias 6-14: Frontend (Construção da UI e Integração)
+docker compose up -d --build
 
-    Início da interface com a implementação do fluxo de autenticação (Login/Register).
+2️⃣ Instalação e Execução (Raiz do Projeto)
 
-    Construção da Dashboard principal.
+Na pasta raiz:
 
-    Integração com o back-end para buscar dados (fetch).
+npm install
+npm run dev
 
-    Implementação da criação da primeira Task diretamente pelo front-end.
+3️⃣ Tipos Compartilhados (packages/types)
 
-    Implementação da rota de Update.
+Execute o pacote responsável por compartilhar DTOs e interfaces:
 
-    Criação de um sistema simplificado de Audit Logs.
+cd packages/types
+npm run dev
 
-    Implementação final do cliente Socket.io para receber dados e atualizações em tempo real do back-end.
+4️⃣ Front-end (Aplicação React)
 
-⚠️ Problemas Conhecidos e Melhorias
+Por fim, inicie a aplicação cliente:
 
-    Problema (Monorepo): A configuração de paths do TypeScript (tsconfig.json) no monorepo ainda pode ser frágil e exigir manutenção cuidadosa.
+cd apps/web
+npm run dev
 
-    Melhoria (Audit Logs): O sistema de Audit Logs atual é simplificado. Uma melhoria seria criar um microsserviço dedicado (audit-service) que apenas escuta eventos do RabbitMQ (ex: task.created, comment.added) e os registra de forma assíncrona.
-
-    Melhoria (Testes): O projeto precisa de uma suíte de testes (unitários e E2E) para garantir a estabilidade dos microsserviços e a comunicação entre eles.
-
-🚀 Instruções de Execução (Específicas)
-
-Como este é um projeto em monorepo com múltiplos microsserviços, vários componentes precisam ser executados simultaneamente.
-
-    Dependências Externas:
-
-        Certifique-se de que o PostgreSQL e o RabbitMQ estejam em execução (ex: via Docker). docker-compose up -d
-
-    Variáveis de Ambiente:
-
-        Cada microsserviço (em apps/) e o Gateway precisarão de seus próprios arquivos .env(api-gateway & auth-service). 
-
-        Certifique-se de que as credenciais do RabbitMQ e do Banco de Dados estão corretas em cada serviço.
-
-    Instalação (Raiz):
-
-        Instale todas as dependências do monorepo a partir da pasta raiz. npm install (ou yarn / pnpm)
-
-    Executar o Back-end (Microsserviços):
-
-        Você precisará de um terminal para cada serviço que deseja executar.
-
-        (Exemplo de comando, ajuste conforme seu package.json):
-    Bash
-
-# Terminal 1: Serviço de Autenticação
-npm run start:dev
-
-# Terminal 2: Serviço de Tarefas
-npm run start:dev 
-
-# Terminal 3: Serviço de Comentários
-npm run start:dev 
-
-# Terminal 4: O Gateway
-npm run start:dev
-Executar o Front-end:
-
-    Em um novo terminal, inicie a aplicação React.
-
-Bash
-
-# Terminal 5: Aplicação Cliente
-npm run start:dev 
-
-
+✅ Resumo do Ambiente em Execução
+Componente	Comando	Status Esperado
+🧠 Microsserviços + Gateway	npm run dev (na raiz)	Em execução
+🐇 RabbitMQ + PostgreSQL	docker compose up -d --build	Contêineres ativos
+📦 Tipos compartilhados	npm run dev (em packages/types)	Servindo DTOs
+🌐 Front-end	npm run dev (em apps/web)	Acessível em http://localhost:5173
+<p align="center"> Feito com ❤️ por <strong>Victor</strong> </p> ```
