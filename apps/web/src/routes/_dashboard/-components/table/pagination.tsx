@@ -49,14 +49,23 @@ export function Pagination({
   function lastPage() {
     setPage(String(paginationItem.totalPages));
   }
+
   const isFirstPage = Number(paginationItem.currentPage) === 1;
   const isLastPage =
     Number(paginationItem.currentPage) === Number(paginationItem.totalPages);
+
+  const totalItems = Number(paginationItem.totalItem);
+  const itemsPerPage = Number(paginationItem.itemsPerPage);
+  const currentPage = Number(paginationItem.currentPage);
+
+  const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+
+  const itemsOnPage = totalItems === 0 ? 0 : endItem - startItem + 1;
   return (
     <div className="w-full flex items-center text-sm justify-between">
       <span>
-        Mostrando {paginationItem.itemsPerPage} de {paginationItem.totalItem}{" "}
-        itens
+        Mostrando {itemsOnPage} de {paginationItem.totalItem} itens
       </span>
 
       <div className="flex items-center gap-12">
