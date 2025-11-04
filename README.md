@@ -16,6 +16,7 @@ A arquitetura é dividida entre uma interface de cliente, um ponto de entrada de
 
 Snippet de código
 
+```text
 [ Cliente (React, Zustand, TanStack Router) ]
    |
    |--- (1) HTTP API (Login, Register, CreateTask)
@@ -49,8 +50,9 @@ Snippet de código
                                     |
                                     `---> (Evento consumido pelo Gateway
                                            para notificar o cliente via Socket.io)
+```
 
-🧠 Decisões Técnicas e Trade-offs
+🧠 **Decisões Técnicas e Trade-offs**
 
 Durante o desenvolvimento, várias decisões de arquitetura foram tomadas:
 
