@@ -19,7 +19,7 @@ type AuditLogsModalProps = {
 function formatAuditLogMessage(log: AuditLog): string {
   let formattedDate: string;
   try {
-    formattedDate = formatDate(log.createdAt);
+    formattedDate = formatDate(new Date(log.createdAt));
   } catch (error) {
     formattedDate = new Date(log.createdAt).toLocaleString("pt-BR", {
       dateStyle: "short",
@@ -41,12 +41,8 @@ function formatAuditLogMessage(log: AuditLog): string {
       return `Membros responsáveis foram atualizados em ${formattedDate}.`;
 
     case "deadline": {
-      const oldDate = log.oldValue
-        ? formatDate(log.oldValue, "dd/MM/yy")
-        : "N/A";
-      const newDate = log.newValue
-        ? formatDate(log.newValue, "dd/MM/yy")
-        : "N/A";
+      const oldDate = log.oldValue ? formatDate(new Date(log.oldValue)) : "N/A";
+      const newDate = log.newValue ? formatDate(new Date(log.newValue)) : "N/A";
       return `Prazo alterado de "${oldDate}" para "${newDate}" em ${formattedDate}.`;
     }
 

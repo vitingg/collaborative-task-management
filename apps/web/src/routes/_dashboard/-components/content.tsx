@@ -56,7 +56,7 @@ export function Content() {
         <Pagination
           page={page}
           setPage={setPage}
-          paginationItem={paginationItem}
+          paginationItem={paginationItem!}
           size={size}
           onSizeChange={handleSizeChange}
         />

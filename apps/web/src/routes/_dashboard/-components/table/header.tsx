@@ -6,7 +6,7 @@ type headerContentProps = {
   setSearch: (v: string) => void;
 };
 
-export function HeaderContent({ search, setSearch }: headerContentProps) {
+export function HeaderContent({ setSearch }: headerContentProps) {
   return (
     <span className="flex items-center justify-between">
       <Input

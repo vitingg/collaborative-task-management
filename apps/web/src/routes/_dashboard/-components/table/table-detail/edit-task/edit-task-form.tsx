@@ -32,7 +32,9 @@ type EditTaskFormProps = {
   onClose: () => void;
 };
 
-type TaskFormData = createTaskTypes;
+type TaskFormData = Omit<createTaskTypes, "deadline"> & {
+  deadline: string;
+};
 
 export function EditTaskForm({ task, allUsers, onClose }: EditTaskFormProps) {
   const { mutate: updateTask, isPending } = usePutTask();
@@ -46,30 +48,18 @@ export function EditTaskForm({ task, allUsers, onClose }: EditTaskFormProps) {
       priority: task.priority,
       deadline: task.deadline
         ? new Date(task.deadline).toISOString().split("T")[0]
-        : "00-00-0000",
-      assigneesIds:
-        (task.assignees?.map((user) => user?.id).filter(Boolean) as string[]) ||
-        [],
+        : "",
+      assigneesIds: task.assigneesIds || [],
     },
   });
 
   function onSubmit(data: TaskFormData) {
-    const payload = {
+    const payload: createTaskTypes = {
       ...data,
-      deadline: data.deadline
-        ? new Date(data.deadline).toISOString().split("T")[0]
-        : undefined,
+      deadline: data.deadline ? new Date(data.deadline) : new Date(),
     };
-    console.log(payload);
 
-    updateTask(
-      { taskId: task.id, payload: payload },
-      {
-        onSuccess: () => {
-          onClose();
-        },
-      }
-    );
+    updateTask({ taskId: task.id, payload }, { onSuccess: onClose });
   }
 
   return (

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDownIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "react-toastify";
 import { useState } from "react";
 import {
   Dialog,
@@ -32,7 +33,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { toast } from "react-toastify";
 
 export function AddTaskForm() {
   const [open, setOpen] = useState(false);
@@ -61,7 +61,7 @@ export function AddTaskForm() {
         description: newData.description,
         priority: newData.priority,
         status: "TODO",
-        deadline: newDate,
+        deadline: new Date(newDate),
         authorId: user.id,
       };
       createTask(payload, {
@@ -87,7 +87,6 @@ export function AddTaskForm() {
             <DialogDescription>Crie novas tarefas</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            {/* Title */}
             <div className="grid gap-3">
               <Label htmlFor="title">Titulo</Label>
               <Input
@@ -97,7 +96,6 @@ export function AddTaskForm() {
               />
             </div>
 
-            {/* Description */}
             <div className="grid gap-3">
               <Label htmlFor="description">Descrição</Label>
               <Input
@@ -106,8 +104,6 @@ export function AddTaskForm() {
                 {...register("description")}
               />
             </div>
-
-            {/* Priority and Deadline */}
             <div className="flex gap-3">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="priority" className="px-1">
