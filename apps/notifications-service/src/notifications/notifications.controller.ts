@@ -12,16 +12,16 @@ export class NotificationsController {
   @EventPattern("task.created")
   onCreateTask(@Payload() data: any) {
     console.log(data);
-    this.notificationsGateway.server.emit("task-created", data);
+    this.notificationsGateway.server.emit("task:created", data);
   }
 
-  @EventPattern("task.updated")
+  @EventPattern("task:updated")
   onUpdatedTask(@Payload() data: any) {
     console.log(data);
     this.notificationsGateway.server.emit("task-updated", data);
   }
 
-  @EventPattern("task.comment.created")
+  @EventPattern("comment:new")
   onCommentaryCreated(@Payload() data: any) {
     console.log(data);
     this.notificationsGateway.server.emit("task-comment-created", data);

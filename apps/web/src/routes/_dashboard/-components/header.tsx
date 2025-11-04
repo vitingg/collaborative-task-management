@@ -8,6 +8,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { NotificationMenu } from "@/components/notifications-menu";
+import { LogOut } from "lucide-react";
 
 export function Header() {
   const { logout } = useAuthStore();
@@ -20,27 +22,36 @@ export function Header() {
           Aqui está uma lista de suas tarefas desse mês.
         </p>
       </span>
-      <span>
+      <div className="flex items-center gap-4">
+        <NotificationMenu />
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size={"icon"} className="rounded-full cursor-pointer">
+            <Button
+              variant="outline"
+              size={"icon"}
+              className="rounded-full cursor-pointer"
+            >
               VG
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>Perfil</DropdownMenuLabel>
+
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuItem
               variant="destructive"
+              className="cursor-pointer"
               onClick={() => {
                 logout();
                 navigate({ to: "/login" });
               }}
             >
-              Logout
+              <LogOut className="mr-2 h-4 w-4" />
+              Sair
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </span>
+      </div>
     </div>
   );
 }

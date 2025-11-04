@@ -1,135 +1,182 @@
-# Turborepo starter
+Sistema de Gestão de Tarefas Colaborativo
 
-This Turborepo starter is maintained by the Turborepo core team.
+Este é um projeto full-stack de um sistema de gestão de tarefas colaborativo, construído com foco em escalabilidade e reatividade.
 
-## Using this example
+O back-end utiliza uma arquitetura de microsserviços com NestJS e RabbitMQ para comunicação assíncrona. O front-end é construído em React (com Zustand e TanStack Router) e se comunica com o back-end via HTTP e WebSockets (Socket.io) para atualizações em tempo real.
 
-Run the following command:
+O projeto é organizado como um Monorepo.
 
-```sh
-npx create-turbo@latest
-```
+🏗️ Arquitetura
 
-## What's inside?
+A arquitetura é dividida entre uma interface de cliente, um ponto de entrada de API (Gateway) e múltiplos microsserviços especializados. A comunicação acontece de duas formas:
 
-This Turborepo includes the following packages/apps:
+    Síncrona (HTTP): Usada para operações que exigem uma resposta imediata (ex: Login, Registro).
 
-### Apps and Packages
+    Assíncrona (RabbitMQ): Usada para comandos e eventos que podem ser processados em segundo plano (ex: Criar Tarefa, Adicionar Comentário), permitindo que a UI responda instantaneamente.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+Snippet de código
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+[ Cliente (React, Zustand, TanStack Router) ]
+   |
+   |--- (1) HTTP API (Login, Register, CreateTask)
+   |
+   |--- (2) WebSocket (Receber atualizações 'task_created', etc)
+   |
+   v
++-------------------------------------------+
+|      API Gateway / Main App (NestJS)      |
+|    (Recebe HTTP, Autentica JWT,           |
+|     Gerencia Conexões Socket.io)          |
++-------------------------------------------+
+   |      |                        |
+   |      | (A) HTTP Sync          | (B) Mensageria Async
+   |      | (p/ Auth)              | (p/ Tasks, Comments)
+   |      |                        |
+   v      v                        v
++-----------+                +---------------------+
+| Serviço   |                |     RabbitMQ        |
+| de Auth   |                +---------------------+
+| (NestJS)  |                     |           |
++-----------+                     |           |
+                                  v           v
+                        +-----------+   +-------------+
+                        | Serviço   |   | Serviço de  |
+                        | de Tasks  |   | Comentários |
+                        | (NestJS)  |   | (NestJS)    |
+                        +-----------+   +-------------+
+                             |               |
+                             `----(evento)---'
+                                    |
+                                    `---> (Evento consumido pelo Gateway
+                                           para notificar o cliente via Socket.io)
 
-### Utilities
+🧠 Decisões Técnicas e Trade-offs
 
-This Turborepo has some additional tools already setup for you:
+Durante o desenvolvimento, várias decisões de arquitetura foram tomadas:
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+    Monorepo vs. Multi-repo:
 
-### Build
+        Decisão: Utilizar um Monorepo.
 
-To build all apps and packages, run the following command:
+        Trade-off (Pró): Gerenciamento centralizado de dependências, compartilhamento de código (ex: DTOs, interfaces) entre o front-end e os microsserviços, consistência de tooling.
 
-```
-cd my-turborepo
+        Trade-off (Contra): Alta complexidade inicial de configuração, especialmente com paths do TypeScript e resolução de módulos entre os pacotes (um desafio enfrentado no Dia 4).
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+    Comunicação de Microsserviços (HTTP vs. RabbitMQ para Auth):
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+        Decisão: Usar uma abordagem híbrida.
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+        Trade-off (Contexto - Dia 2): Foi analisado o uso de RabbitMQ para autenticação (Login/Register). Usar RabbitMQ (padrão Request/Reply) eliminaria a dependência direta do Gateway com o serviço de Auth.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+        Trade-off (Conclusão): No entanto, operações de autenticação são inerentemente síncronas (o usuário precisa esperar a resposta). Usar um message broker para isso adiciona complexidade desnecessária. A decisão final foi usar HTTP síncrono (Gateway -> Serviço de Auth). Isso cria uma dependência de serviço, mas simplifica drasticamente o fluxo de autenticação, que é o comportamento esperado para essa operação.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+    Comunicação para Ações (Tasks/Comments):
 
-### Develop
+        Decisão: Usar RabbitMQ para operações de escrita (CUD - Create, Update, Delete).
 
-To develop all apps and packages, run the following command:
+        Trade-off (Pró): Alta resiliência e performance percebida. O cliente envia a requisição (HTTP) ao Gateway, que a publica no RabbitMQ e retorna 201 Created ou 202 Accepted imediatamente. O processamento real (salvar no banco) acontece em background.
 
-```
-cd my-turborepo
+        Trade-off (Contra): O cliente precisa de um segundo canal (Socket.io) para receber a confirmação ou os dados atualizados quando o processamento for concluído.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+    Reatividade (Socket.io):
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+        Decisão: Integrar o Socket.io (provavelmente no Gateway) para reatividade em tempo real.
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+        Trade-off (Pró): Permite uma experiência colaborativa. Quando o "Serviço de Tasks" termina de processar uma nova tarefa, ele emite um evento (via RabbitMQ) que o Gateway consome e retransmite ao cliente via WebSocket.
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+        Trade-off (Contra): Gerenciamento de estado de conexão e escalabilidade dos sockets (se houver múltiplas instâncias do Gateway).
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+⏱️ Cronograma e Tempo Gasto
 
-### Remote Caching
+O projeto foi dividido em duas fases principais (Backend e Frontend):
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+Dias 1-3: Backend (Fundação e Configuração)
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+    Scaffolding e configuração inicial do Monorepo.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+    Desenvolvimento do primeiro CRUD (Register) e adaptação à arquitetura do NestJS e OOP.
 
-```
-cd my-turborepo
+    Estudo inicial da separação de responsabilidades em microsserviços.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+Dia 4: Backend (Débito Técnico/Configuração)
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+    Foco intenso em depuração de problemas do Monorepo.
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+    Resolução de paths do TypeScript, módulos não encontrados e leitura de documentação para estabilizar o ambiente de desenvolvimento.
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+Dias 5-6: Backend (Lógica e Real-Time)
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+    Criação de rotas e lógicas de negócio.
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
+    Início da análise de responsabilidade e implementação do Socket.io para comunicação em tempo real.
 
-## Useful Links
+Dias 6-14: Frontend (Construção da UI e Integração)
 
-Learn more about the power of Turborepo:
+    Início da interface com a implementação do fluxo de autenticação (Login/Register).
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+    Construção da Dashboard principal.
+
+    Integração com o back-end para buscar dados (fetch).
+
+    Implementação da criação da primeira Task diretamente pelo front-end.
+
+    Implementação da rota de Update.
+
+    Criação de um sistema simplificado de Audit Logs.
+
+    Implementação final do cliente Socket.io para receber dados e atualizações em tempo real do back-end.
+
+⚠️ Problemas Conhecidos e Melhorias
+
+    Problema (Monorepo): A configuração de paths do TypeScript (tsconfig.json) no monorepo ainda pode ser frágil e exigir manutenção cuidadosa.
+
+    Melhoria (Audit Logs): O sistema de Audit Logs atual é simplificado. Uma melhoria seria criar um microsserviço dedicado (audit-service) que apenas escuta eventos do RabbitMQ (ex: task.created, comment.added) e os registra de forma assíncrona.
+
+    Melhoria (Testes): O projeto precisa de uma suíte de testes (unitários e E2E) para garantir a estabilidade dos microsserviços e a comunicação entre eles.
+
+🚀 Instruções de Execução (Específicas)
+
+Como este é um projeto em monorepo com múltiplos microsserviços, vários componentes precisam ser executados simultaneamente.
+
+    Dependências Externas:
+
+        Certifique-se de que o PostgreSQL e o RabbitMQ estejam em execução (ex: via Docker). docker-compose up -d
+
+    Variáveis de Ambiente:
+
+        Cada microsserviço (em apps/) e o Gateway precisarão de seus próprios arquivos .env(api-gateway & auth-service). 
+
+        Certifique-se de que as credenciais do RabbitMQ e do Banco de Dados estão corretas em cada serviço.
+
+    Instalação (Raiz):
+
+        Instale todas as dependências do monorepo a partir da pasta raiz. npm install (ou yarn / pnpm)
+
+    Executar o Back-end (Microsserviços):
+
+        Você precisará de um terminal para cada serviço que deseja executar.
+
+        (Exemplo de comando, ajuste conforme seu package.json):
+    Bash
+
+# Terminal 1: Serviço de Autenticação
+npm run start:dev
+
+# Terminal 2: Serviço de Tarefas
+npm run start:dev 
+
+# Terminal 3: Serviço de Comentários
+npm run start:dev 
+
+# Terminal 4: O Gateway
+npm run start:dev
+Executar o Front-end:
+
+    Em um novo terminal, inicie a aplicação React.
+
+Bash
+
+# Terminal 5: Aplicação Cliente
+npm run start:dev 
+
+

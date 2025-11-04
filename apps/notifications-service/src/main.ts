@@ -5,6 +5,9 @@ import { AppModule } from "./app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: "http://localhost:5173",
+  });
   app.useWebSocketAdapter(new IoAdapter(app));
 
   app.connectMicroservice<MicroserviceOptions>({
@@ -18,7 +21,7 @@ async function bootstrap() {
     },
   });
   await app.startAllMicroservices();
-  await app.listen(3003);
-  console.log(`Notifications service working on port 3003`);
+  await app.listen(3004);
+  console.log(`Notifications service working on port 3004`);
 }
 bootstrap();

@@ -37,14 +37,14 @@ export class TasksService {
     }
 
     const newTask = this.taskRepository.create(newTaskData)
-    const saved = this.taskRepository.save(newTask)
+    const saved = await this.taskRepository.save(newTask)
 
     await this.auditLogService.create({
       fieldChanged: 'task',
       oldValue: null,
       newValue: 'created',
-      userId: (await saved).authorId,
-      taskId: (await saved).id,
+      userId: saved.authorId,
+      taskId: saved.id,
     })
     this.rabbitClient.emit('task.created', saved)
     return saved

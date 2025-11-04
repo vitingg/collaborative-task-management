@@ -2,6 +2,8 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Header } from "./-components/header";
 import { Content } from "./-components/content";
 import { useAuthStore } from "@/stores/auth-store";
+import { useSocketStore } from "@/stores/socket-store";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/_dashboard/dashboard")({
   beforeLoad: ({ location }) => {
@@ -20,6 +22,13 @@ export const Route = createFileRoute("/_dashboard/dashboard")({
 });
 
 function Dashboard() {
+  const { connect, disconnect } = useSocketStore();
+  useEffect(() => {
+    connect();
+    return () => {
+      disconnect();
+    };
+  }, [connect, disconnect]);
   return (
     <div className="space-y-16 w-full min-h-screen bg-background relative px-24 py-12">
       <Header />
