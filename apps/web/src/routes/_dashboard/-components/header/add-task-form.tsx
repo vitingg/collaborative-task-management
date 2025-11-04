@@ -32,6 +32,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { toast } from "react-toastify";
 
 export function AddTaskForm() {
   const [open, setOpen] = useState(false);
@@ -63,7 +64,12 @@ export function AddTaskForm() {
         deadline: newDate,
         authorId: user.id,
       };
-      createTask(payload);
+      createTask(payload, {
+        onSuccess: () => {
+          toast.success("Tarefa criada com sucesso!");
+          setOpen(false);
+        },
+      });
     } catch (error) {
       console.log(error);
     }

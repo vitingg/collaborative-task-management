@@ -1,11 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useRegister } from "@/services/auth/use-register";
 import { FooterCard } from "../-components/footer-card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
-import { useRegister } from "@/services/auth/use-register";
+import { toast } from "react-toastify";
 import {
   registerSchema,
   type registerSchemaInfer,
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/_auth/_layout/register")({
 
 function Register() {
   const { mutate: registerMutate } = useRegister();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -38,7 +40,16 @@ function Register() {
   const passwordError = errors.password?.message;
 
   async function handleRegister(data: registerSchemaInfer) {
-    registerMutate(data);
+    registerMutate(data, {
+      onSuccess: () => {
+        toast.success("Conta criada com sucesso!");
+        navigate({ to: "/login" });
+      },
+      onError: (error) => {
+        console.log(error);
+        toast.error("Houve algum erro na criação de seu usuário!");
+      },
+    });
   }
 
   return (

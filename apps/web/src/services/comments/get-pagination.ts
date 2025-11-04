@@ -18,7 +18,7 @@ async function getComments({ id, page, size }: getCommentsProps) {
 
 export function usePaginationComments({ id, page, size }: getCommentsProps) {
   return useQuery({
-    queryKey: [QUERY_KEYS.GET_PAGINATION_COMMENTS],
+    queryKey: [QUERY_KEYS.GET_PAGINATION_COMMENTS, id, page, size],
     queryFn: () => getComments({ id, page, size }),
     enabled: !!id,
   });

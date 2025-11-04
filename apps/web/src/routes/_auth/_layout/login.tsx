@@ -1,13 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { FooterCard } from "../-components/footer-card";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLogin } from "@/services/auth/use-login";
 import { useAuthStore } from "@/stores/auth-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { useLogin } from "@/services/auth/use-login";
 import {
   Card,
   CardContent,

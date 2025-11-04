@@ -1,9 +1,12 @@
 import { usePaginationComments } from "@/services/comments/get-pagination";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import type { getCommentsType } from "@/types/comments/get-comments";
 import type { getOneTaskTypes } from "@/types/tasks/get-one-task";
-import { type Dispatch, type SetStateAction } from "react";
 import { useGetTask } from "@/services/tasks/use-get-task";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { priority } from "@/lib/priority";
 import { formatDate } from "@/lib/date";
 import { status } from "@/lib/status";
@@ -14,10 +17,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useCreateComment } from "@/services/comments/post-comment";
 
 type TaskDetailsProps = {
   data: getOneTaskTypes;
   commentsData: getCommentsType;
+  taskId: string;
 };
 
 type AllDataModalProps = {
@@ -58,7 +63,7 @@ export function AllDataModal({ setTaskId, taskId }: AllDataModalProps) {
         }
       }}
     >
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Detalhes da Tarefa</DialogTitle>
           {isLoading && (
@@ -85,7 +90,11 @@ export function AllDataModal({ setTaskId, taskId }: AllDataModalProps) {
             </div>
           )}
           {canRenderDetails && (
-            <TaskDetails data={data} commentsData={commentsData} />
+            <TaskDetails
+              data={data}
+              commentsData={commentsData}
+              taskId={taskId}
+            />
           )}
         </div>
       </DialogContent>
@@ -120,62 +129,93 @@ const LoadingSkeleton = () => (
   </div>
 );
 
-const TaskDetails = ({ data, commentsData }: TaskDetailsProps) => (
-  <div className="space-y-4">
-    <div className="space-y-1">
-      <label className="text-sm font-medium text-muted-foreground">
-        Título
-      </label>
-      <p className="text-base">{data.title}</p>
-    </div>
+const TaskDetails = ({ data, commentsData, taskId }: TaskDetailsProps) => {
+  const [newComment, setNewComment] = useState("");
+  const { mutate: createComment } = useCreateComment({ taskId });
 
-    <div className="space-y-1">
-      <label className="text-sm font-medium text-muted-foreground">
-        Descrição
-      </label>
-      <p className="text-base">{data.description}</p>
-    </div>
+  function handleCommentSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    console.log(newComment);
 
-    <div className="grid grid-cols-3 gap-4">
+    createComment(newComment);
+  }
+
+  return (
+    <div className="space-y-4">
       <div className="space-y-1">
         <label className="text-sm font-medium text-muted-foreground">
-          Status
+          Título
         </label>
-        <div className="text-base">{status(data.status)}</div>
+        <p className="text-base">{data.title}</p>
       </div>
+
       <div className="space-y-1">
         <label className="text-sm font-medium text-muted-foreground">
-          Prioridade
+          Descrição
         </label>
-        <div className="text-base">{priority(data.priority)}</div>
+        <p className="text-base">{data.description}</p>
       </div>
-      <div className="space-y-1">
+
+      <div className="grid grid-cols-3 gap-4">
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-muted-foreground">
+            Status
+          </label>
+          <div className="text-base">{status(data.status)}</div>
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-muted-foreground">
+            Prioridade
+          </label>
+          <div className="text-base">{priority(data.priority)}</div>
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-muted-foreground">
+            Data de entrega
+          </label>
+          <p className="text-base">{formatDate(data.deadline)}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4"></div>
+
+      <div className="space-y-4 pt-2">
         <label className="text-sm font-medium text-muted-foreground">
-          Data de entrega
+          Comentários
         </label>
-        <p className="text-base">{formatDate(data.deadline)}</p>
-      </div>
-    </div>
 
-    <div className="grid grid-cols-3 gap-4"></div>
-
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-muted-foreground">
-        Comentários
-      </label>
-      <div className="space-y-2 max-h-32 overflow-y-auto pr-2">
-        {commentsData.data.length > 0 ? (
-          commentsData.data.map((c) => (
-            <p key={c.id} className="text-sm border-b pb-2">
-              {c.comment}
+        <div className="space-y-2 max-h-32 overflow-y-auto pr-2 border-b pb-2">
+          {commentsData.data.length > 0 ? (
+            commentsData.data.map((c) => (
+              <div key={c.id} className="text-sm border-b pb-2 last:border-b-0">
+                <p>{c.comment}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground italic">
+              Nenhum comentário encontrado.
             </p>
-          ))
-        ) : (
-          <p className="text-sm text-muted-foreground italic">
-            Nenhum comentário encontrado.
-          </p>
-        )}
+          )}
+        </div>
+
+        <form onSubmit={handleCommentSubmit} className="space-y-3">
+          <Label htmlFor="new-comment" className="font-medium">
+            Adicionar novo comentário
+          </Label>
+          <Textarea
+            id="new-comment"
+            placeholder="Escreva seu comentário..."
+            className="min-h-20"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+          />
+          <div className="flex justify-end">
+            <Button type="submit" disabled={newComment.trim().length === 0}>
+              Publicar
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
-  </div>
-);
+  );
+};

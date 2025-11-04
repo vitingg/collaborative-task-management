@@ -18,7 +18,7 @@ async function bootstrap() {
     },
   });
   await app.startAllMicroservices();
-  await app.listen(3001);
-  console.log("Notifications service working...");
+  await app.listen(3003);
+  console.log(`Notifications service working on port 3003`);
 }
 bootstrap();

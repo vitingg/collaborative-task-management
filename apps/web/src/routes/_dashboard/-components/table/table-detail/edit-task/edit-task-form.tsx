@@ -62,14 +62,14 @@ export function EditTaskForm({ task, allUsers, onClose }: EditTaskFormProps) {
     };
     console.log(payload);
 
-    // updateTask(
-    //   { taskId: task.id, payload: payload },
-    //   {
-    //     onSuccess: () => {
-    //       onClose();
-    //     },
-    //   }
-    // );
+    updateTask(
+      { taskId: task.id, payload: payload },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      }
+    );
   }
 
   return (

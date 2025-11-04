@@ -16,10 +16,14 @@ export function usePutTask() {
     mutationFn: ({ taskId, payload }: MutateVariables) => {
       return privateApi.put(`tasks/${taskId}`, payload);
     },
-    onSuccess: () => {
+    onSuccess: (_, variable) => {
+      const { taskId } = variable;
       toast.success("Tarefa atualizada com sucesso");
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_ALL_TASKS],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_TASK, taskId],
       });
     },
     onError: (error) => {

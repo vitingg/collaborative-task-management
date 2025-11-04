@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 
 @WebSocketGateway({
   cors: {
-    origin: "*",
+    origin: "http://localhost:5173",
   },
 })
 export class NotificationsGateway {
