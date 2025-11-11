@@ -1,6 +1,7 @@
 import { usePaginationComments } from "@/services/comments/get-pagination";
 import { type Dispatch, type SetStateAction, useState } from "react";
 import type { getCommentsType } from "@/types/comments/get-comments";
+import { useCreateComment } from "@/services/comments/post-comment";
 import type { getOneTaskTypes } from "@/types/tasks/get-one-task";
 import { useGetTask } from "@/services/tasks/use-get-task";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,7 +18,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useCreateComment } from "@/services/comments/post-comment";
 
 type TaskDetailsProps = {
   data: getOneTaskTypes;
@@ -130,8 +130,8 @@ const LoadingSkeleton = () => (
 );
 
 const TaskDetails = ({ data, commentsData, taskId }: TaskDetailsProps) => {
-  const [newComment, setNewComment] = useState("");
   const { mutate: createComment } = useCreateComment({ taskId });
+  const [newComment, setNewComment] = useState("");
 
   function handleCommentSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "@tanstack/react-router";
+import { redirect, useNavigate } from "@tanstack/react-router";
 import { useAuthStore } from "@/stores/auth-store";
 import {
   DropdownMenu,
@@ -10,9 +10,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { NotificationMenu } from "@/components/notifications-menu";
 import { LogOut } from "lucide-react";
+import { getInitials } from "@/lib/get-initials";
 
 export function Header() {
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
+
+  if (!user) {
+    redirect({ to: "/login" });
+  }
+
   const navigate = useNavigate();
   return (
     <div className="flex items-center justify-between">
@@ -32,7 +38,7 @@ export function Header() {
               size={"icon"}
               className="rounded-full cursor-pointer"
             >
-              VG
+              {getInitials(user ? user.username : "UNAVAILABLE")}
             </Button>
           </DropdownMenuTrigger>
 

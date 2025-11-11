@@ -1,7 +1,7 @@
+import type { PaginationDto } from '@collab-task-management/types'
 import { MessagePattern, Payload } from '@nestjs/microservices'
 import { CommentService } from './comment.service'
 import { Controller } from '@nestjs/common'
-import type { PaginationDto } from 'dist'
 
 @Controller()
 export class CommentController {

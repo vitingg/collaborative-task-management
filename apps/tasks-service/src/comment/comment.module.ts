@@ -1,11 +1,11 @@
+import { ClientsModule, Transport } from '@nestjs/microservices'
 import { CommentController } from './comment.controller'
+import { Task } from '../tasks/entities/task.entity'
 import { Comment } from './entities/comment.entity'
 import { CommentService } from './comment.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
 import { Module } from '@nestjs/common'
-import { Task } from '../tasks/entities/task.entity'
-import { ClientsModule, Transport } from '@nestjs/microservices'
 
 @Module({
   imports: [

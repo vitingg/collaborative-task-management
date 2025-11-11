@@ -1,3 +1,7 @@
+import { useGetAllUsers } from "@/services/auth/use-get-all-users";
+import { useGetTask } from "@/services/tasks/use-get-task";
+import type { Dispatch, SetStateAction } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Sheet,
   SheetContent,
@@ -5,10 +9,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import type { Dispatch, SetStateAction } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useGetTask } from "@/services/tasks/use-get-task";
-import { useGetAllUsers } from "@/services/auth/use-get-all-users";
 
 import { EditTaskForm } from "./edit-task-form";
 

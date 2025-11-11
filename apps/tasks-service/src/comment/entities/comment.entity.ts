@@ -1,3 +1,4 @@
+import { Task } from '../../tasks/entities/task.entity'
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,7 +7,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm'
-import { Task } from '../../tasks/entities/task.entity'
 
 @Entity('comments')
 export class Comment {
