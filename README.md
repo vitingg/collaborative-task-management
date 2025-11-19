@@ -89,6 +89,9 @@ O sistema é dividido entre:
                                     |
                                     `---> (Evento consumido pelo Gateway
                                            para notificar o cliente via Socket.io)
+```
+````
+
 🧠 Decisões Técnicas e Trade-offs
 🔸 Monorepo vs. Multi-repo
 Decisão: Monorepo
@@ -126,7 +129,6 @@ Complexidade no gerenciamento de múltiplas conexões e escalabilidade
 ## ⏱️ Cronograma de Desenvolvimento
 
 | 🧩 **Fase** | 📝 **Descrição** | ⏳ **Dias** |
-|:--|:--|:--:|
 | **Backend — Fundamentos** | Estrutura inicial do Monorepo, CRUD básico (Register), microsserviços iniciais | **1–3** |
 | **Backend — Débito Técnico** | Correção de paths, modules e configurações TypeScript | **4** |
 | **Backend — Real-Time** | Implementação do Socket.io e lógica de negócio | **5–6** |
@@ -206,5 +208,4 @@ Componente	Comando	Status Esperado
 📦 Tipos compartilhados	npm run dev (em packages/types)	Servindo DTOs
 🌐 Front-end	npm run dev (em apps/web)	Acessível em http://localhost:5173
 
-Feito com ❤️ por mim, Victor Gabriel ```
-````
+Feito com ❤️ por mim, Victor Gabriel 
