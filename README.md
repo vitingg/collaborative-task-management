@@ -89,7 +89,6 @@ O sistema é dividido entre:
                                     |
                                     `---> (Evento consumido pelo Gateway
                                            para notificar o cliente via Socket.io)
-```
 ````
 
 🧠 Decisões Técnicas e Trade-offs
@@ -160,14 +159,14 @@ Complexidade no gerenciamento de múltiplas conexões e escalabilidade
 Cada serviço possui suas próprias variáveis de ambiente.
 
 ### 📦 `apps/api-gateway/.env`
-```env
 JWT_SECRET=seu_token_aqui
-🔐 apps/auth-service/.env
-env
-Copy code
+
+### 🔐 apps/auth-service/.env
 JWT_SECRET=seu_token_aqui
 JWT_REFRESH=seu_refresh_token_aqui
-⚠️ Os demais serviços não requerem variáveis específicas no momento.
+
+
+### ⚠️ Os demais serviços não requerem variáveis específicas no momento.
 
 🚀 Instruções de Execução
 Este projeto é um monorepo full-stack com múltiplos microsserviços e um cliente React.
@@ -177,31 +176,34 @@ Siga as etapas abaixo para configurar e executar corretamente o sistema:
 Certifique-se de que Docker e Docker Compose estão instalados.
 O projeto depende de PostgreSQL e RabbitMQ, inicializados via Docker:
 
-bash
-Copy code
-docker compose up -d --build
+
+``` docker compose up -d --build ```
+
 ⚙️ 2️⃣ Instalação e Execução (Raiz do Projeto)
 Na pasta raiz, instale as dependências e inicie todos os serviços do monorepo:
 
-bash
-Copy code
+```
 npm install
 npm run dev
+```
+
 🧱 3️⃣ Tipos Compartilhados (packages/types)
 Este pacote contém DTOs e interfaces compartilhadas entre microsserviços:
 
-bash
-Copy code
+```
 cd packages/types
 npm run dev
+```
+
 💻 4️⃣ Front-end (Aplicação React)
 Por fim, inicie o cliente web (interface do usuário):
 
-bash
-Copy code
+```
 cd apps/web
 npm run dev
-✅ Resumo do Ambiente em Execução
+```
+
+### ✅ Resumo do Ambiente em Execução
 Componente	Comando	Status Esperado
 🧠 Microsserviços + Gateway	npm run dev (na raiz)	Em execução
 🐇 RabbitMQ + PostgreSQL	docker compose up -d --build	Contêineres ativos
