@@ -25,12 +25,6 @@ O sistema é dividido entre:
 - **Microsserviços especializados:** Auth, Tasks, Comments
 - **Assíncrona (RabbitMQ)** — comandos e eventos em segundo plano (Criar usuário, Criar Tarefa, Adicionar Comentário)
 
-<p align="center">
-  <img src="https://img.shields.io/badge/NestJS-v10-E0234E?style=for-the-badge&logo=nestjs&logoColor=white"/>
-  <img src="https://img.shields.io/badge/RabbitMQ-ready-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white"/>
-  <img src="https://img.shields.io/badge/React-v18-61DAFB?style=for-the-badge&logo=react&logoColor=black"/>
-  <img src="https://img.shields.io/badge/Zustand-Store-181717?style=for-the-badge&logo=zustand&logoColor=white"/>
-</p>
 
 ### 🔹 Diagrama Simplificado
 
@@ -44,64 +38,50 @@ O sistema é dividido entre:
    v
 +-------------------------------------------+
 |      API Gateway / Main App (NestJS)      |
-|    (Recebe HTTP, Autentica JWT,           |
-|     Gerencia Conexões Socket.io)          |
+| Autentica JWT, Gerencia Conexões Socket.io|
 +-------------------------------------------+
-   |      |                        |
-   |      | (A) HTTP Sync          | (B) Mensageria Async
-   |      | (p/ Auth)              | (p/ Tasks, Comments)
-   |      |                        |
-   v      v                        v
-+-----------+                +---------------------+
-| Serviço   |                |     RabbitMQ        |
-| de Auth   |                +---------------------+
-| (NestJS)  |                     |           |
-+-----------+                     |           |
-                                  v           v
-                        +-----------+   +-------------+
-                        | Serviço   |   | Serviço de  |
-                        | de Tasks  |   | Comentários |
-                        | (NestJS)  |   | (NestJS)    |
-                        +-----------+   +-------------+
-                             |               |
-                             `----(evento)---'
-                                    |
-                                    `---> (Evento consumido pelo Gateway
-                                           para notificar o cliente via Socket.io)
+      |                     | 
+      |   (A) Mensageiria   | 
+      |   Async (p/ Auth)   |
+      |                     | 
+      v                     v
+      +---------------------+
+      |     RabbitMQ        |
+      +---------------------+ 
+           v           v
+     +-----------+    +-----------+   +-------------+   +--------------+
+     | Serviço   |    | Serviço   |   | Serviço de  |   | Serviço de   |
+     | de Auth   |    | de Tasks  | - | Comentários | - | Notificações |
+     | (NestJS)  |    | (NestJS)  |   | (NestJS)    |   | (NestJS)     |
+     +-----------+    +-----------+   +-------------+   +--------------+
+          |               |
+          `----(evento)---'
+                   |
+                   `---> (Evento consumido pelo Gateway
+                         para notificar o cliente via Socket.io)
+
 ````
 
-🧠 Decisões Técnicas e Trade-offs
-🔸 Monorepo vs. Multi-repo
-Decisão: Monorepo
+## Decisões Técnicas e Trade-offs
+
+##### Monorepo vs. Multi-repo
+###### Decisão: Monorepo
 
 Prós:
-
 Gerenciamento centralizado de dependências
-
 Compartilhamento de código (DTOs, interfaces)
-
 Consistência entre serviços
 
 Contras:
-
 Maior complexidade na configuração de paths TypeScript (resolvido no Dia 4)
+Comunicação entre Microsserviços
 
-🔸 Comunicação entre Microsserviços
-Decisão: Abordagem híbrida — HTTP para Auth e RabbitMQ para Tasks/Comments
-
-Auth (HTTP): Ideal para operações síncronas (login e registro).
-
-Tasks/Comments (RabbitMQ): Usado para operações CUD em background, garantindo resiliência.
-
-🔸 Reatividade (Socket.io)
-Decisão: O Gateway gerencia as conexões WebSocket com o cliente.
+###### Decisão: O Gateway gerencia as conexões WebSocket com o cliente.
 
 Prós:
-
 Experiência colaborativa em tempo real
 
 Contras:
-
 Complexidade no gerenciamento de múltiplas conexões e escalabilidade
 
 ## ⏱️ Cronograma de Desenvolvimento
@@ -138,35 +118,28 @@ Complexidade no gerenciamento de múltiplas conexões e escalabilidade
 Cada serviço possui suas próprias variáveis de ambiente.
 
 ### 📦 `apps/api-gateway/.env`
-JWT_SECRET=seu_token_aqui
+`JWT_SECRET=seu_token_aqui`
 
-### 🔐 apps/auth-service/.env
-JWT_SECRET=seu_token_aqui
-JWT_REFRESH=seu_refresh_token_aqui
+### 🔐 `apps/auth-service/.env`
+`JWT_SECRET=seu_token_aqui`
+`JWT_REFRESH=seu_refresh_token_aqui`
 
 
-### ⚠️ Os demais serviços não requerem variáveis específicas no momento.
+#### ⚠️ Os demais serviços não requerem variáveis específicas no momento.
 
-🚀 Instruções de Execução
+### 🚀 Instruções de Execução
 Este projeto é um monorepo full-stack com múltiplos microsserviços e um cliente React.
 Siga as etapas abaixo para configurar e executar corretamente o sistema:
 
-🐋 1️⃣ Dependências Externas
-Certifique-se de que Docker e Docker Compose estão instalados.
-O projeto depende de PostgreSQL e RabbitMQ, inicializados via Docker:
-
-
-``` docker compose up -d --build ```
-
-⚙️ 2️⃣ Instalação e Execução (Raiz do Projeto)
-Na pasta raiz, instale as dependências e inicie todos os serviços do monorepo:
+⚙️ Instalação e Execução (Raiz do Projeto)
+Na pasta raiz, após clonar o repositório, instale as dependências e inicie todos os serviços do monorepo:
 
 ```
 npm install
 npm run dev
 ```
 
-🧱 3️⃣ Tipos Compartilhados (packages/types)
+🧱 Tipos Compartilhados (packages/types)
 Este pacote contém DTOs e interfaces compartilhadas entre microsserviços:
 
 ```
@@ -174,10 +147,19 @@ cd packages/types
 npm run dev
 ```
 
-💻 4️⃣ Front-end (Aplicação React)
+🐋 Dependências Externas
+Certifique-se de que Docker e Docker Compose estão instalados.
+O projeto depende de PostgreSQL e RabbitMQ, inicializados via Docker:
+
+
+``` docker compose up -d --build ```
+
+
+💻 Front-end (Aplicação React)
 Por fim, inicie o cliente web (interface do usuário):
 
 ```
+cd ../..
 cd apps/web
 npm run dev
 ```
