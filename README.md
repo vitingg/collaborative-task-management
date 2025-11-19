@@ -57,14 +57,7 @@ O sistema é dividido entre:
 > > > > > > > 735c270 (fix(tasks-service)&feat(web): fix import and created function get initial name)
 > > > > > > > A comunicação ocorre de duas formas:
 
-- **Síncrona (HTTP)** — operações imediatas (Login, Registro)
-- **Assíncrona (RabbitMQ)** — comandos e eventos em segundo plano (Criar Tarefa, Adicionar Comentário)
-
-# <<<<<<< HEAD
-
----
-
-> > > > > > > 735c270 (fix(tasks-service)&feat(web): fix import and created function get initial name)
+- **Assíncrona (RabbitMQ)** — comandos e eventos em segundo plano (Criar usuário, Criar Tarefa, Adicionar Comentário)
 
 ### 🔹 Diagrama Simplificado
 
@@ -219,5 +212,5 @@ Componente	Comando	Status Esperado
 📦 Tipos compartilhados	npm run dev (em packages/types)	Servindo DTOs
 🌐 Front-end	npm run dev (em apps/web)	Acessível em http://localhost:5173
 
-<p align="center"> Feito com ❤️ por Victor<br/> <sub>Desenvolvido com foco em arquitetura limpa, escalabilidade e colaboração em tempo real.</sub> </p> ```
+Feito com ❤️ por Victor Desenvolvido com foco em arquitetura limpa, escalabilidade e colaboração em tempo real. ```
 ````
