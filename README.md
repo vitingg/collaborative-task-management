@@ -5,8 +5,6 @@
   Construído com <b>NestJS</b>, <b>RabbitMQ</b>, <b>React</b>, <b>Zustand</b> e <b>TanStack Router</b>.
 </p>
 
-## <<<<<<< HEAD
-
 ## 📘 Sumário
 
 1. [🏗️ Arquitetura](#-arquitetura)
