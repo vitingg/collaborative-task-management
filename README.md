@@ -24,8 +24,6 @@ O sistema é dividido entre:
 - **API Gateway** (NestJS)
 - **Microsserviços especializados** (Auth, Tasks, Comments)
 
-=======
-
 <p align="center">
   <img src="https://img.shields.io/badge/NestJS-v10-E0234E?style=for-the-badge&logo=nestjs&logoColor=white"/>
   <img src="https://img.shields.io/badge/RabbitMQ-ready-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white"/>
@@ -53,10 +51,6 @@ O sistema é dividido entre:
 - **Interface cliente:** React
 - **API Gateway:** NestJS
 - **Microsserviços especializados:** Auth, Tasks, Comments
-
-> > > > > > > 735c270 (fix(tasks-service)&feat(web): fix import and created function get initial name)
-> > > > > > > A comunicação ocorre de duas formas:
-
 - **Assíncrona (RabbitMQ)** — comandos e eventos em segundo plano (Criar usuário, Criar Tarefa, Adicionar Comentário)
 
 ### 🔹 Diagrama Simplificado
@@ -212,5 +206,5 @@ Componente	Comando	Status Esperado
 📦 Tipos compartilhados	npm run dev (em packages/types)	Servindo DTOs
 🌐 Front-end	npm run dev (em apps/web)	Acessível em http://localhost:5173
 
-Feito com ❤️ por Victor Desenvolvido com foco em arquitetura limpa, escalabilidade e colaboração em tempo real. ```
+Feito com ❤️ por mim, Victor Gabriel ```
 ````
