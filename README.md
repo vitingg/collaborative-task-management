@@ -20,9 +20,10 @@
 
 O sistema é dividido entre:
 
-- **Interface cliente** (React)
-- **API Gateway** (NestJS)
-- **Microsserviços especializados** (Auth, Tasks, Comments)
+- **Interface cliente:** React
+- **API Gateway:** NestJS
+- **Microsserviços especializados:** Auth, Tasks, Comments
+- **Assíncrona (RabbitMQ)** — comandos e eventos em segundo plano (Criar usuário, Criar Tarefa, Adicionar Comentário)
 
 <p align="center">
   <img src="https://img.shields.io/badge/NestJS-v10-E0234E?style=for-the-badge&logo=nestjs&logoColor=white"/>
@@ -30,28 +31,6 @@ O sistema é dividido entre:
   <img src="https://img.shields.io/badge/React-v18-61DAFB?style=for-the-badge&logo=react&logoColor=black"/>
   <img src="https://img.shields.io/badge/Zustand-Store-181717?style=for-the-badge&logo=zustand&logoColor=white"/>
 </p>
-
----
-
-## 📘 Sumário
-
-1. [🏗️ Arquitetura](#-arquitetura)
-2. [🧠 Decisões Técnicas e Trade-offs](#-decisões-técnicas-e-trade-offs)
-3. [⏱️ Cronograma de Desenvolvimento](#️-cronograma-de-desenvolvimento)
-4. [⚠️ Problemas e Melhorias Futuras](#️-problemas-e-melhorias-futuras)
-5. [⚙️ Arquivos .env](#️-arquivos-env)
-6. [🚀 Instruções de Execução](#-instruções-de-execução)
-
----
-
-## 🏗️ Arquitetura
-
-O sistema é dividido entre:
-
-- **Interface cliente:** React
-- **API Gateway:** NestJS
-- **Microsserviços especializados:** Auth, Tasks, Comments
-- **Assíncrona (RabbitMQ)** — comandos e eventos em segundo plano (Criar usuário, Criar Tarefa, Adicionar Comentário)
 
 ### 🔹 Diagrama Simplificado
 
