@@ -159,7 +159,6 @@ O projeto depende de PostgreSQL e RabbitMQ, inicializados via Docker:
 Por fim, inicie o cliente web (interface do usuário):
 
 ```
-cd ../..
 cd apps/web
 npm run dev
 ```
